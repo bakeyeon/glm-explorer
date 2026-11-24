@@ -29,7 +29,7 @@ html:not([data-ready]) main{visibility:hidden}[data-lang][aria-pressed=true]{bor
 <div id="st" role="status"></div>
 <details class="box" open><summary>{{사용 전에 읽어 주십시오||Please read before using}}</summary><ul>
 <li><b>{{연구 설계와 Y의 성질을 아는 분의 판단을 돕는 도구입니다.||Meant to support your own knowledge of the design and Y.}}</b>{{ 추천은 탐색용 참고 자료입니다.|| Suggestions are exploratory pointers.}}</li>
-<li><b>{{Y 자체의 히스토그램만으로는 분포를 판단하기 어렵습니다.||A histogram of Y is not evidence for a distribution.}}</b>{{ GLM은 X가 주어졌을 때의 Y를 가정하므로 이 앱은 잔차와 시뮬레이션을 보여줍니다.|| GLMs make assumptions about Y given X, so check residuals and simulations.}}</li>
+<li><b>{{Y 자체의 히스토그램만으로는 분포를 판단하기 어렵습니다.||A histogram of Y alone says little about the distribution.}}</b>{{ GLM은 X가 주어졌을 때의 Y를 가정하므로 이 앱은 잔차와 시뮬레이션을 보여줍니다.|| GLMs make assumptions about Y given X, so this app shows residuals and simulations.}}</li>
 <li><b>{{AIC는 후보들 사이의 상대 순위입니다.||AIC only ranks the candidates relative to each other.}}</b>{{ 1등도 데이터에 맞지 않을 수 있어 진단을 함께 표시합니다. ΔAIC가 2 이하면 사실상 구분하기 어렵습니다.|| Even the top one can fit badly, so diagnostics are shown alongside. ΔAIC of 2 or less is practically a tie.}}</li>
 <li><b>{{p값이 마음에 드는 분포를 고르지 않도록 설계되었습니다.||Designed to keep p-values out of the choice.}}</b>{{ 계수와 p값은 분포를 확정한 뒤에 보실 수 있습니다.|| Coefficients and p-values become available once you choose a distribution.}}</li>
 <li><b>{{같은 데이터로 분포를 고르고 검정하면||Choosing and testing on the same data}}</b>{{ p값이 낙관적일 수 있습니다. 사전등록, 다른 데이터로의 확인, 비교한 후보의 보고가 도움이 됩니다. 비교표는 CSV로 저장할 수 있습니다.|| can make p-values optimistic. Preregistration, confirmation on other data or reporting all candidates helps. The comparison table can be saved as CSV.}}</li>
