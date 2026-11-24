@@ -22,10 +22,13 @@ pre{background:var(--bg);border:1px solid var(--grid);border-radius:6px;padding:
 #pat,#qq{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin:10px 0}#qq figure{background:var(--sf);border:1px solid var(--grid);border-radius:8px;padding:8px}#qq figure.rec{border:2px solid var(--s1);padding:7px}#pat svg,#qq svg{width:100%;height:auto;display:block}#pat figcaption,#qq figcaption{font-size:13px;line-height:1.45}
 @media(max-width:720px){.ch{grid-template-columns:1fr}}
 html:not([data-ready]) main{visibility:hidden}[data-lang][aria-pressed=true]{border-color:var(--s1);background:var(--tint);font-weight:600}
+a{color:var(--link)}
+:root{--link:#1f5fb0}@media(prefers-color-scheme:dark){:root{--link:#7db3f5}}
 </style></head><body><main>
 <div class="row" style="justify-content:space-between;align-items:flex-start"><h1>{{GLM 분포 비교||GLM Distribution Explorer}}</h1><div class="row" role="group" aria-label="Language" style="gap:4px"><button data-lang="en">English</button><button data-lang="ko">한국어</button></div></div>
 <p class="sub">{{데이터를 넣으면 가능한 분포를 한 번에 돌려 그래프와 함께 비교합니다. 파일은 이 브라우저 안에서만 계산되고 서버로 보내지 않습니다.||Load data to fit every plausible distribution at once and compare them visually. Your file is processed only in this browser and never uploaded.}}</p>
 <p class="box" style="border-left:3px solid var(--s1)"><b>{{분석 초기에 간단히 돌려보는 용도입니다.||For a quick first look, not a final analysis.}}</b> {{어떤 분포가 그럴듯한지 대략 확인하고, 실제 분석은 데이터와 연구 설계에 맞게 코드를 다시 작성하시기를 권합니다.||See which distributions look plausible, then write analysis code that fits your own data and design.}}</p>
+<p class="mut">{{내려받아 로컬에서 사용하실 수도 있습니다. 저장소에서 index.html을 받아 브라우저로 여시면 됩니다. R을 불러올 때는 인터넷 연결이 필요합니다.||You can also run it locally: download index.html from the repository and open it in a browser. An internet connection is needed to load R.}} <a href="https://github.com/bakeyeon/glm-explorer" target="_blank" rel="noopener">github.com/bakeyeon/glm-explorer</a></p>
 <div id="st" role="status"></div>
 <details class="box" open><summary>{{사용 전에 읽어 주십시오||Please read before using}}</summary><ul>
 <li><b>{{연구 설계와 Y의 성질을 아는 분의 판단을 돕는 도구입니다.||Meant to support your own knowledge of the design and Y.}}</b>{{ 추천은 탐색용 참고 자료입니다.|| Suggestions are exploratory pointers.}}</li>

@@ -8,6 +8,10 @@ Fit every plausible GLM/GLMM distribution to your data at once, compare them vis
 
 Everything runs in your browser with [webR](https://docs.r-wasm.org/webr/latest/). Your data file is never uploaded. The first load takes about a minute because R and its packages are downloaded from the webR CDN.
 
+## Run locally
+
+Download `index.html` (or Code → Download ZIP) and open it in a browser. Nothing to install. An internet connection is needed because R is loaded from the webR CDN; your data still stays on your computer.
+
 ## What it does
 
 - Y types: real, positive, non-negative with zeros, count, proportion, binary, successes/trials, ordinal
