@@ -105,49 +105,49 @@ setup <- function(cfgjson) {
   off <- if (length(cfg$off)) v(cfg$off); tr <- if (length(cfg$tri)) v(cfg$tri)
   d <- S$raw[c(yv, num, fac, re, off, tr)]; n0 <- nrow(d); d <- d[complete.cases(d), , drop = FALSE]
   warn <- character(); kind <- cfg$kind
-  if (nrow(d) < 10) stop("{{결측을 뺀 행이 10개 미만이에요.||Fewer than 10 rows remain after removing missing values.}}")
-  for (k in c(num, off, tr)) if (!is.numeric(d[[k]])) stop(bf("{{'%s' 열은 숫자가 아니에요.||Column '%s' is not numeric.}}", lab(k)))
+  if (nrow(d) < 10) stop("{{결측을 뺀 행이 10개 미만입니다.||Fewer than 10 rows remain after removing missing values.}}")
+  for (k in c(num, off, tr)) if (!is.numeric(d[[k]])) stop(bf("{{'%s' 열은 숫자가 아닙니다.||Column '%s' is not numeric.}}", lab(k)))
   if (kind == "ordinal") {
-    if (!is.numeric(d[[yv]])) stop("{{순서형 Y는 1, 2, 3처럼 숫자로 코딩해 주세요.||Please code ordinal Y as numbers such as 1, 2, 3.}}")
-    if (length(unique(d[[yv]])) < 3) stop("{{순서형 Y는 단계가 3개 이상이어야 해요.||Ordinal Y needs at least 3 levels.}}")
+    if (!is.numeric(d[[yv]])) stop("{{순서형 Y는 1, 2, 3처럼 숫자로 코딩해 주십시오.||Please code ordinal Y as numbers such as 1, 2, 3.}}")
+    if (length(unique(d[[yv]])) < 3) stop("{{순서형 Y는 단계가 3개 이상이어야 합니다.||Ordinal Y needs at least 3 levels.}}")
   } else if (kind == "binary") {
-    u <- sort(unique(d[[yv]])); if (length(u) != 2) stop("{{이분형 Y는 값이 두 종류여야 해요.||Binary Y must have exactly two values.}}")
+    u <- sort(unique(d[[yv]])); if (length(u) != 2) stop("{{이분형 Y는 값이 두 종류여야 합니다.||Binary Y must have exactly two values.}}")
     S$succ <- u[2]; d[[yv]] <- as.integer(d[[yv]] == u[2])
-    if (!is.numeric(u) || any(u != c(0, 1))) warn <- c(warn, bf("{{Y의 '%s'를 1(성공)로 두었어요.||'%s' in Y is treated as 1 (success).}}", u[2]))
-  } else if (!is.numeric(d[[yv]])) stop("{{Y가 숫자가 아니에요.||Y is not numeric.}}")
+    if (!is.numeric(u) || any(u != c(0, 1))) warn <- c(warn, bf("{{Y의 '%s'를 1(성공)로 두었습니다.||'%s' in Y is treated as 1 (success).}}", u[2]))
+  } else if (!is.numeric(d[[yv]])) stop("{{Y가 숫자가 아닙니다.||Y is not numeric.}}")
   y <- d[[yv]]; int <- all(abs(y - round(y)) < 1e-9)
-  if (any(!is.finite(y))) stop("{{Y에 무한대 값이 있어요.||Y contains infinite values.}}")
+  if (any(!is.finite(y))) stop("{{Y에 무한대 값이 있습니다.||Y contains infinite values.}}")
   bad <- switch(kind, pos = any(y <= 0), zeropos = any(y < 0), count = any(y < 0) || !int,
     prop = any(y < 0 | y > 1), FALSE)
-  if (bad) stop("{{Y 값이 고른 유형과 맞지 않아요 (음수, 0, 소수 여부를 확인해 주세요).||Y does not match the selected type (check for negatives, zeros or decimals).}}")
+  if (bad) stop("{{Y 값이 고른 유형과 맞지 않습니다 (음수, 0, 소수 여부를 확인해 주십시오).||Y does not match the selected type (check for negatives, zeros or decimals).}}")
   if (kind == "trials") {
-    if (is.null(tr)) stop("{{시행 수 열을 지정해 주세요.||Please assign a trials column.}}")
-    if (!int || any(y < 0 | y > d[[tr]]) || any(d[[tr]] < 1 | d[[tr]] %% 1 != 0)) stop("{{성공 수/시행 수 값이 잘못됐어요.||Invalid successes/trials values.}}")
+    if (is.null(tr)) stop("{{시행 수 열을 지정해 주십시오.||Please assign a trials column.}}")
+    if (!int || any(y < 0 | y > d[[tr]]) || any(d[[tr]] < 1 | d[[tr]] %% 1 != 0)) stop("{{성공 수/시행 수 값이 잘못됐습니다.||Invalid successes/trials values.}}")
   }
-  if (length(unique(y)) < 2) stop("{{Y 값이 모두 같아요.||All Y values are identical.}}")
+  if (length(unique(y)) < 2) stop("{{Y 값이 모두 같습니다.||All Y values are identical.}}")
   if (!is.null(off)) {
-    if (any(d[[off]] <= 0)) stop("{{노출량은 0보다 커야 해요.||Exposure must be greater than 0.}}")
-    if (!kind %in% c("pos", "zeropos", "count")) stop("{{노출량은 로그 링크를 쓰는 Y 유형에서만 쓸 수 있어요.||Exposure is only available for Y types that use a log link.}}")
+    if (any(d[[off]] <= 0)) stop("{{노출량은 0보다 커야 합니다.||Exposure must be greater than 0.}}")
+    if (!kind %in% c("pos", "zeropos", "count")) stop("{{노출량은 로그 링크를 쓰는 Y 유형에서만 쓸 수 있습니다.||Exposure is only available for Y types that use a log link.}}")
   }
   for (k in c(fac, re)) d[[k]] <- droplevels(factor(d[[k]]))
-  for (k in c(fac, re)) if (nlevels(d[[k]]) < 2) stop(bf("{{'%s'의 수준이 하나뿐이에요.||'%s' has only one level.}}", lab(k)))
-  for (k in num) if (length(unique(d[[k]])) < 2) stop(bf("{{'%s' 값이 모두 같아요.||All values of '%s' are identical.}}", lab(k)))
+  for (k in c(fac, re)) if (nlevels(d[[k]]) < 2) stop(bf("{{'%s'의 수준이 하나뿐입니다.||'%s' has only one level.}}", lab(k)))
+  for (k in num) if (length(unique(d[[k]])) < 2) stop(bf("{{'%s' 값이 모두 같습니다.||All values of '%s' are identical.}}", lab(k)))
   S$zx <- if (isTRUE(cfg$zx)) num else character(); S$zy <- isTRUE(cfg$zy)
   for (k in S$zx) d[[k]] <- as.numeric(scale(d[[k]]))
   if (S$zy) {
-    if (kind %in% c("binary", "trials", "ordinal")) stop("{{이 Y 유형은 표준화할 수 없어요.||This Y type cannot be standardized.}}")
-    if (!is.null(off)) stop("{{Y를 표준화하면 노출량(offset)은 쓸 수 없어요.||Exposure (offset) cannot be used with standardized Y.}}")
+    if (kind %in% c("binary", "trials", "ordinal")) stop("{{이 Y 유형은 표준화할 수 없습니다.||This Y type cannot be standardized.}}")
+    if (!is.null(off)) stop("{{Y를 표준화하면 노출량(offset)은 쓸 수 없습니다.||Exposure (offset) cannot be used with standardized Y.}}")
     d[[yv]] <- y <- as.numeric(scale(y))
-    warn <- c(warn, "{{Y를 표준화해서 Gaussian만 돌렸어요. 표준화해도 분포 모양은 그대로라 치우친 Y가 정규분포가 되지는 않아요.||Y is standardized, so only Gaussian was run. Standardizing keeps the shape: a skewed Y does not become normal.}}")
-    if (kind %in% c("count", "prop", "zeropos")) warn <- c(warn, "{{원래 Y가 횟수, 비율, 0이 섞인 값이라 Gaussian이 부적절할 수 있어요. raw Y로도 비교해 보세요.||The original Y is a count, proportion or zero-mixed value, so Gaussian may be inappropriate. Compare with raw Y too.}}")
+    warn <- c(warn, "{{Y를 표준화해서 Gaussian만 돌렸습니다. 표준화해도 분포 모양은 그대로라 치우친 Y가 정규분포가 되지는 않습니다.||Y is standardized, so only Gaussian was run. Standardizing keeps the shape: a skewed Y does not become normal.}}")
+    if (kind %in% c("count", "prop", "zeropos")) warn <- c(warn, "{{원래 Y가 횟수, 비율, 0이 섞인 값이라 Gaussian이 부적절할 수 있습니다. raw Y로도 비교해 보십시오.||The original Y is a count, proportion or zero-mixed value, so Gaussian may be inappropriate. Compare with raw Y too.}}")
   }
-  if (length(S$zx)) warn <- c(warn, "{{수치 X를 분석에 쓴 행의 평균과 표준편차로 표준화했어요. 계수는 X가 1 SD 늘 때의 변화예요.||Numeric X were standardized with the mean and SD of the analyzed rows. Coefficients are changes per 1 SD of X.}}")
+  if (length(S$zx)) warn <- c(warn, "{{수치 X를 분석에 쓴 행의 평균과 표준편차로 표준화했습니다. 계수는 X가 1 SD 늘 때의 변화입니다.||Numeric X were standardized with the mean and SD of the analyzed rows. Coefficients are changes per 1 SD of X.}}")
   rhsx <- c(num, fac)
   rhs <- if (!length(rhsx)) "1" else if (isTRUE(cfg$inter) && length(rhsx) > 1)
     sprintf("(%s)^2", paste(rhsx, collapse = " + ")) else paste(rhsx, collapse = " + ")
   slope <- if (length(cfg$slope)) v(cfg$slope)
-  if (kind == "ordinal" && !is.null(slope)) { slope <- NULL; warn <- c(warn, "{{순서형에서는 랜덤 기울기를 지원하지 않아 랜덤 절편만 썼어요.||Random slopes are not supported for ordinal Y; only random intercepts were used.}}") }
-  if (!is.null(slope) && !(slope %in% rhsx)) stop("{{랜덤 기울기 변수는 X에도 있어야 해요.||The random slope variable must also be an X.}}")
+  if (kind == "ordinal" && !is.null(slope)) { slope <- NULL; warn <- c(warn, "{{순서형에서는 랜덤 기울기를 지원하지 않아 랜덤 절편만 썼습니다.||Random slopes are not supported for ordinal Y; only random intercepts were used.}}") }
+  if (!is.null(slope) && !(slope %in% rhsx)) stop("{{랜덤 기울기 변수는 X에도 있어야 합니다.||The random slope variable must also be an X.}}")
   ret <- if (length(re)) paste(sprintf("(1%s | %s)", if (is.null(slope)) "" else paste(" +", slope), re), collapse = " + ")
   S$tr <- tr; S$slope <- slope; S$off <- off; S$rhs <- rhs; S$re <- re; S$yv <- yv; S$kind <- kind; S$d <- d; S$y <- y
   lhs <- if (kind == "trials") sprintf("cbind(%s, %s - %s)", yv, tr, yv) else yv
@@ -156,28 +156,28 @@ setup <- function(cfgjson) {
   if (S$zy) { dis <- lapply(S$L, `[[`, "name"); dis <- dis[dis != "Gaussian"]
     S$L <- list(cand("Gaussian", "gaussian()", link = "identity")) }
   X <- model.matrix(as.formula(paste("~", rhs)), d); p <- ncol(X); n <- nrow(d)
-  if (qr(X)$rank < p) stop("{{X끼리 완전히 겹치는 조합이 있어 계수를 추정할 수 없어요. 변수나 교호작용을 줄여 주세요.||Some X are perfectly collinear, so coefficients cannot be estimated. Remove variables or interactions.}}")
-  if (n0 > n) warn <- c(warn, bf("{{결측 때문에 %d행을 뺐어요. 모든 분포를 같은 %d행으로 비교해요.||%d rows were dropped for missing values. All distributions are compared on the same %d rows.}}", n0 - n, n))
+  if (qr(X)$rank < p) stop("{{X끼리 완전히 겹치는 조합이 있어 계수를 추정할 수 없습니다. 변수나 교호작용을 줄여 주십시오.||Some X are perfectly collinear, so coefficients cannot be estimated. Remove variables or interactions.}}")
+  if (n0 > n) warn <- c(warn, bf("{{결측 때문에 %d행을 뺐습니다. 모든 분포를 같은 %d행으로 비교합니다.||%d rows were dropped for missing values. All distributions are compared on the same %d rows.}}", n0 - n, n))
   eff <- if (kind == "binary") min(table(y)) else n
-  if (eff / p < 10) warn <- c(warn, bf("{{데이터가 적어요 (유효 관측 %d개, 고정효과 계수 %d개). 분포 순위가 불안정할 수 있어요.||Small data (%d effective observations, %d fixed coefficients). The ranking may be unstable.}}", as.integer(eff), p))
-  if (n > 5000) warn <- c(warn, "{{표본이 커서 작은 어긋남도 유의하게 나와요. p값보다 그래프와 어긋난 크기를 보세요.||With a large sample even tiny misfit is significant. Look at the plots and the size of the misfit rather than p-values.}}")
+  if (eff / p < 10) warn <- c(warn, bf("{{데이터가 적습니다 (유효 관측 %d개, 고정효과 계수 %d개). 분포 순위가 불안정할 수 있습니다.||Small data (%d effective observations, %d fixed coefficients). The ranking may be unstable.}}", as.integer(eff), p))
+  if (n > 5000) warn <- c(warn, "{{표본이 커서 작은 어긋남도 유의하게 나옵니다. p값보다 그래프와 어긋난 크기를 보십시오.||With a large sample even tiny misfit is significant. Look at the plots and the size of the misfit rather than p-values.}}")
   for (k in re) {
-    if (nlevels(d[[k]]) < 5) warn <- c(warn, bf("{{랜덤효과 '%s'의 집단이 %d개뿐이라 분산 추정이 불안정해요.||Random effect '%s' has only %d groups, so its variance estimate is unstable.}}", lab(k), nlevels(d[[k]])))
-    if (nlevels(d[[k]]) == n) warn <- c(warn, bf("{{'%s'는 행마다 값이 달라요. 관측 단위 랜덤효과라 잔차 분산과 구분되지 않을 수 있어요.||'%s' differs on every row. As an observation-level random effect it may not be separable from residual variance.}}", lab(k)))
+    if (nlevels(d[[k]]) < 5) warn <- c(warn, bf("{{랜덤효과 '%s'의 집단이 %d개뿐이라 분산 추정이 불안정합니다.||Random effect '%s' has only %d groups, so its variance estimate is unstable.}}", lab(k), nlevels(d[[k]])))
+    if (nlevels(d[[k]]) == n) warn <- c(warn, bf("{{'%s'는 행마다 값이 다릅니다. 관측 단위 랜덤효과라 잔차 분산과 구분되지 않을 수 있습니다.||'%s' differs on every row. As an observation-level random effect it may not be separable from residual variance.}}", lab(k)))
   }
-  if (length(re) && kind == "pos" && !S$zy) warn <- c(warn, "{{Inverse Gaussian은 랜덤효과가 있으면 같은 기준의 우도를 얻기 어려워 뺐어요.||Inverse Gaussian was left out: with random effects a likelihood on the same footing is hard to obtain.}}")
-  if (!length(re)) warn <- c(warn, "{{랜덤효과가 없어요. 한 사람/집단에서 여러 번 측정했다면 ID를 랜덤효과로 넣어야 해요.||No random effect. If the same person or group was measured repeatedly, add its ID as a random effect.}}")
-  if (kind == "binary") warn <- c(warn, "{{0/1 자료의 분포는 이항분포로 정해져 있어요. 여기서 비교하는 건 링크 함수이고, 분포 진단으로는 문제를 잘 못 잡아요.||0/1 data are always binomial. What is compared here is the link function, and distribution diagnostics detect little.}}")
+  if (length(re) && kind == "pos" && !S$zy) warn <- c(warn, "{{Inverse Gaussian은 랜덤효과가 있으면 같은 기준의 우도를 얻기 어려워 뺐습니다.||Inverse Gaussian was left out: with random effects a likelihood on the same footing is hard to obtain.}}")
+  if (!length(re)) warn <- c(warn, "{{랜덤효과가 없습니다. 한 사람/집단에서 여러 번 측정했다면 ID를 랜덤효과로 넣어야 합니다.||No random effect. If the same person or group was measured repeatedly, add its ID as a random effect.}}")
+  if (kind == "binary") warn <- c(warn, "{{0/1 자료의 분포는 이항분포로 정해져 있습니다. 여기서 비교하는 것은 링크 함수이고, 분포 진단으로는 문제를 잘 못 잡습니다.||0/1 data are always binomial. What is compared here is the link function, and distribution diagnostics detect little.}}")
   if (kind == "ordinal") {
     gap <- setdiff(seq(min(y), max(y)), y)
-    if (int && length(gap)) warn <- c(warn, bf("{{중간 단계 %s은(는) 응답이 없어서, 나온 단계끼리 이어서 계산해요.||Level(s) %s were never chosen; the observed levels are treated as adjacent.}}", paste(gap, collapse = ", ")))
+    if (int && length(gap)) warn <- c(warn, bf("{{중간 단계 %s은(는) 응답이 없어서, 나온 단계끼리 이어서 계산합니다.||Level(s) %s were never chosen; the observed levels are treated as adjacent.}}", paste(gap, collapse = ", ")))
     for (k in fac) { one <- names(which(tapply(y, d[[k]], function(v) all(v == min(y)) || all(v == max(y)))))
-      if (length(one)) warn <- c(warn, bf("{{'%s'의 %s은(는) 응답이 모두 척도 끝값이라 계수와 표준오차가 매우 커질 수 있어요.||In '%s', %s has only end-of-scale responses, so its coefficient and standard error may blow up.}}", lab(k), paste(one, collapse = ", "))) }
+      if (length(one)) warn <- c(warn, bf("{{'%s'의 %s은(는) 응답이 모두 척도 끝값이라 계수와 표준오차가 매우 커질 수 있습니다.||In '%s', %s has only end-of-scale responses, so its coefficient and standard error may blow up.}}", lab(k), paste(one, collapse = ", "))) }
     if (int && length(fac)) { part <- unique(unlist(lapply(fac, function(k) names(which(tapply(y, d[[k]], function(v) length(unique(v))) < length(unique(y)))))))
-      if (length(part)) warn <- c(warn, "{{일부 문항이나 집단에서는 안 쓰인 단계가 있어요. 정상이고, 전체 데이터의 단계를 함께 써서 계산해요.||Some items or groups do not use every level. That is fine: the levels of the whole data are shared.}}") }
+      if (length(part)) warn <- c(warn, "{{일부 문항이나 집단에서는 안 쓰인 단계가 있습니다. 정상이고, 전체 데이터의 단계를 함께 써서 계산합니다.||Some items or groups do not use every level. That is fine: the levels of the whole data are shared.}}") }
   }
-  if (kind == "ordinal") warn <- c(warn, "{{누적 모형의 비례 가정은 이 앱이 검사하지 않아요. ordinal::nominal_test 등으로 따로 확인하세요.||This app does not test the proportionality assumption of cumulative models. Check it separately, e.g. with ordinal::nominal_test.}}")
-  if (kind == "pos" && int) warn <- c(warn, "{{Y가 정수예요. 횟수라면 유형을 카운트로 바꾸고, 밀리초처럼 반올림된 측정값이면 그대로 두세요.||Y is integer-valued. If it is a count, switch the type to Count; if it is a rounded measure such as milliseconds, keep it.}}")
+  if (kind == "ordinal") warn <- c(warn, "{{누적 모형의 비례 가정은 이 앱이 검사하지 않습니다. ordinal::nominal_test 등으로 따로 확인하십시오.||This app does not test the proportionality assumption of cumulative models. Check it separately, e.g. with ordinal::nominal_test.}}")
+  if (kind == "pos" && int) warn <- c(warn, "{{Y가 정수입니다. 횟수라면 유형을 카운트로 바꾸고, 밀리초처럼 반올림된 측정값이면 그대로 두십시오.||Y is integer-valued. If it is a count, switch the type to Count; if it is a rounded measure such as milliseconds, keep it.}}")
   js(list(n = n, warn = I(warn), formula = S$f, disabled = I(dis), cands = I(lapply(S$L, `[`, c("name", "note", "cmp")))))
 }
 

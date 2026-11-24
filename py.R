@@ -52,7 +52,7 @@ py_for <- function(i, file, sep = ",", enc = "UTF-8") {
   if (is.null(body)) {
     r <- strsplit(code_for(i, file, sep, enc), "\n")[[1]]
     r <- r[!grepl("^plot\\(|^testDispersion|^summary\\(m\\)$", r)]; r <- sub("; library(DHARMa)", "", r, fixed = TRUE)
-    if (any(grepl("'''", r, fixed = TRUE))) return(js(list(code = "# {{열 이름에 따옴표가 있어 Python 코드를 만들 수 없어요. 열 이름을 바꿔 주세요.||Cannot build Python code because a column name contains quotes. Please rename it.}}", native = FALSE)))
+    if (any(grepl("'''", r, fixed = TRUE))) return(js(list(code = "# {{열 이름에 따옴표가 있어 Python 코드를 만들 수 없습니다. 열 이름을 바꿔 주십시오.||Cannot build Python code because a column name contains quotes. Please rename it.}}", native = FALSE)))
     out <- c(sprintf("# %s", n), "# {{Python(statsmodels)에는 같은 모형이 없어서 rpy2로 R의 모형을 그대로 부릅니다.||statsmodels has no reliable equivalent, so this calls the same R model through rpy2.}}",
       "# {{준비: R 설치, R에서 install.packages(c(\"glmmTMB\", \"ordinal\")), 터미널에서 pip install rpy2||Setup: install R, run install.packages(c(\"glmmTMB\", \"ordinal\")) in R, then pip install rpy2 in a terminal}}",
       "import rpy2.robjects as ro", "", "ro.r(r'''", r, "''')", "print(ro.r(\"summary(m)\"))")

@@ -24,39 +24,39 @@ pre{background:var(--bg);border:1px solid var(--grid);border-radius:6px;padding:
 html:not([data-ready]) main{visibility:hidden}[data-lang][aria-pressed=true]{border-color:var(--s1);background:var(--tint);font-weight:600}
 </style></head><body><main>
 <div class="row" style="justify-content:space-between;align-items:flex-start"><h1>{{GLM 분포 비교||GLM Distribution Explorer}}</h1><div class="row" role="group" aria-label="Language" style="gap:4px"><button data-lang="en">English</button><button data-lang="ko">한국어</button></div></div>
-<p class="sub">{{데이터를 넣으면 가능한 분포를 한 번에 돌려 그래프와 함께 비교해요. 파일은 이 브라우저 안에서만 계산되고 서버로 보내지 않아요.||Load data to fit every plausible distribution at once and compare them visually. Your file is processed only in this browser and never uploaded.}}</p>
-<p class="box" style="border-left:3px solid var(--s1)"><b>{{분석 초기에 대충 한번 돌려보는 용도예요.||For a quick first look, not a final analysis.}}</b> {{어떤 분포가 그럴듯한지 대강 보고, 실제 분석은 데이터와 연구 설계에 맞게 코드를 다시 짜세요.||See which distributions look plausible, then write analysis code that fits your own data and design.}}</p>
+<p class="sub">{{데이터를 넣으면 가능한 분포를 한 번에 돌려 그래프와 함께 비교합니다. 파일은 이 브라우저 안에서만 계산되고 서버로 보내지 않습니다.||Load data to fit every plausible distribution at once and compare them visually. Your file is processed only in this browser and never uploaded.}}</p>
+<p class="box" style="border-left:3px solid var(--s1)"><b>{{분석 초기에 간단히 돌려보는 용도입니다.||For a quick first look, not a final analysis.}}</b> {{어떤 분포가 그럴듯한지 대략 확인하고, 실제 분석은 데이터와 연구 설계에 맞게 코드를 다시 짜십시오.||See which distributions look plausible, then write analysis code that fits your own data and design.}}</p>
 <div id="st" role="status"></div>
-<details class="box" open><summary>{{쓰기 전에 꼭 읽어 주세요||Please read before using}}</summary><ul>
-<li><b>{{분포는 먼저 연구 설계와 Y의 성질로 정하세요.||Start from your design and the nature of Y.}}</b>{{ 이 앱은 그 판단을 돕는 탐색 도구이고, 추천은 결론이 아니에요.|| This is an exploratory aid; its suggestion is not a conclusion.}}</li>
-<li><b>{{Y 자체의 히스토그램은 분포 가정의 근거가 아니에요.||A histogram of Y is not evidence for a distribution.}}</b>{{ GLM은 X가 주어졌을 때의 Y를 가정하므로 잔차와 시뮬레이션으로 확인해요.|| GLMs make assumptions about Y given X, so check residuals and simulations.}}</li>
-<li><b>{{AIC는 후보들 사이의 상대 순위예요.||AIC only ranks the candidates relative to each other.}}</b>{{ 1등도 데이터에 안 맞을 수 있어서 진단을 같이 봐야 해요. ΔAIC가 2 이하면 사실상 구분하기 어려워요.|| Even the top one can fit badly, so read the diagnostics too. ΔAIC of 2 or less is practically a tie.}}</li>
-<li><b>{{p값이 마음에 드는 분포를 고르면 안 돼요.||Never pick a distribution for its p-values.}}</b>{{ 그래서 계수와 p값은 분포를 확정한 뒤에만 보여줘요.|| Coefficients and p-values are therefore shown only after you commit to one.}}</li>
-<li><b>{{같은 데이터로 분포를 고르고 검정하면||Choosing and testing on the same data}}</b>{{ p값이 낙관적일 수 있어요. 사전등록하거나, 다른 데이터로 확인하거나, 비교한 후보를 모두 보고하세요.|| can make p-values optimistic. Preregister, confirm on other data, or report every candidate compared.}}</li>
-<li><b>{{링크와 분포가 바뀌면 계수의 뜻도 바뀌어요.||Coefficients change meaning with the link and distribution.}}</b>{{ 예를 들어 로그 링크의 exp(계수)는 평균의 배수, Lognormal은 기하평균의 배수예요.|| For example, exp(coefficient) is a ratio of means under a log link, but a ratio of geometric means for Lognormal.}}</li>
-<li><b>{{분포로 해결되지 않는 문제도 있어요.||Some problems are not about distribution.}}</b>{{ 반복측정을 무시했거나 비선형, 빠진 변수, 이상치가 있으면 어떤 분포도 잘 안 맞을 수 있어요.|| With ignored repeated measures, nonlinearity, missing predictors or outliers, no distribution may fit.}}</li>
-<li><b>{{진단 등급의 기준은 이 앱이 정한 어림값이에요.||The diagnostic grades use this app's own rules of thumb.}}</b>{{ 집단이 적은 랜덤효과 모형에서는 특히 부정확할 수 있으니 논문에는 R에서 DHARMa 등으로 다시 확인한 결과를 쓰세요.|| They are least reliable for random-effect models with few groups, so recheck (e.g. with DHARMa in R) before publishing.}}</li>
+<details class="box" open><summary>{{쓰기 전에 꼭 읽어 주십시오||Please read before using}}</summary><ul>
+<li><b>{{분포는 먼저 연구 설계와 Y의 성질로 정하십시오.||Start from your design and the nature of Y.}}</b>{{ 이 앱은 그 판단을 돕는 탐색 도구이고, 추천은 결론이 아닙니다.|| This is an exploratory aid; its suggestion is not a conclusion.}}</li>
+<li><b>{{Y 자체의 히스토그램은 분포 가정의 근거가 아닙니다.||A histogram of Y is not evidence for a distribution.}}</b>{{ GLM은 X가 주어졌을 때의 Y를 가정하므로 잔차와 시뮬레이션으로 확인합니다.|| GLMs make assumptions about Y given X, so check residuals and simulations.}}</li>
+<li><b>{{AIC는 후보들 사이의 상대 순위입니다.||AIC only ranks the candidates relative to each other.}}</b>{{ 1등도 데이터에 안 맞을 수 있어서 진단을 같이 봐야 합니다. ΔAIC가 2 이하면 사실상 구분하기 어렵습니다.|| Even the top one can fit badly, so read the diagnostics too. ΔAIC of 2 or less is practically a tie.}}</li>
+<li><b>{{p값이 마음에 드는 분포를 고르면 안 됩니다.||Never pick a distribution for its p-values.}}</b>{{ 그래서 계수와 p값은 분포를 확정한 뒤에만 보여줍니다.|| Coefficients and p-values are therefore shown only after you commit to one.}}</li>
+<li><b>{{같은 데이터로 분포를 고르고 검정하면||Choosing and testing on the same data}}</b>{{ p값이 낙관적일 수 있습니다. 사전등록하거나, 다른 데이터로 확인하거나, 비교한 후보를 모두 보고하십시오.|| can make p-values optimistic. Preregister, confirm on other data, or report every candidate compared.}}</li>
+<li><b>{{링크와 분포가 바뀌면 계수의 뜻도 바뀝니다.||Coefficients change meaning with the link and distribution.}}</b>{{ 예를 들어 로그 링크의 exp(계수)는 평균의 배수, Lognormal은 기하평균의 배수입니다.|| For example, exp(coefficient) is a ratio of means under a log link, but a ratio of geometric means for Lognormal.}}</li>
+<li><b>{{분포로 해결되지 않는 문제도 있습니다.||Some problems are not about distribution.}}</b>{{ 반복측정을 무시했거나 비선형, 빠진 변수, 이상치가 있으면 어떤 분포도 잘 안 맞을 수 있습니다.|| With ignored repeated measures, nonlinearity, missing predictors or outliers, no distribution may fit.}}</li>
+<li><b>{{진단 등급의 기준은 이 앱이 정한 어림값입니다.||The diagnostic grades use this app's own rules of thumb.}}</b>{{ 집단이 적은 랜덤효과 모형에서는 특히 부정확할 수 있으니 논문에는 R에서 DHARMa 등으로 다시 확인한 결과를 쓰십시오.|| They are least reliable for random-effect models with few groups, so recheck (e.g. with DHARMa in R) before publishing.}}</li>
 </ul></details>
 
 <h2>{{1. 데이터||1. Data}}</h2>
 <div class="box"><div class="row"><label>{{CSV/TSV 파일 ||CSV/TSV file }}<input type="file" id="file" accept=".csv,.tsv,.txt"></label></div>
 <div class="row" style="margin-top:10px"><span class="mut">{{예시:||Examples:}}</span><button data-demo="rt">{{반응시간 (반복측정)||Reaction time (repeated)}}</button><button data-demo="count">{{오류 횟수||Error counts}}</button><button data-demo="likert">{{리커트 점수||Likert ratings}}</button></div>
-<p class="mut">{{첫 줄은 열 이름, 한 행은 관측 하나(long 형식)여야 해요. 엑셀은 CSV로 저장해서 올려 주세요.||First line: column names. One row per observation (long format). Save Excel files as CSV first.}}</p></div>
+<p class="mut">{{첫 줄은 열 이름, 한 행은 관측 하나(long 형식)여야 합니다. 엑셀은 CSV로 저장해서 올려 주십시오.||First line: column names. One row per observation (long format). Save Excel files as CSV first.}}</p></div>
 <div id="vars" hidden><h2>{{2. 변수 역할||2. Variable roles}}</h2><div class="box"><p id="dinfo" class="mut"></p><div id="wide" hidden style="border-left:3px solid var(--s1);padding:4px 12px;margin:8px 0"></div><div class="tw"><table><thead><tr><th>{{열||Column}}</th><th>{{값||Values}}</th><th class="n">{{종류 수||Unique}}</th><th class="n">{{결측||Missing}}</th><th>{{역할||Role}}</th><th>{{추천 이유||Why suggested}}</th></tr></thead><tbody id="vb"></tbody></table></div>
-<p class="wa">△ {{열 이름과 값의 모양만 보고 추천한 역할이에요. Y와 ID가 맞는지, 매개변수나 결과 이후 변수가 X에 섞이지 않았는지 확인하고 필요한 것만 바꾸세요.||Roles are guessed from column names and value patterns only. Check Y and ID, and that no mediators or post-outcome variables are among the X, then change what you need.}}</p><div class="row"><button id="sug">{{추천 다시 적용||Reapply suggestions}}</button><button id="clr">{{모두 비우기||Clear all}}</button></div>
+<p class="wa">△ {{열 이름과 값의 모양만 보고 추천한 역할입니다. Y와 ID가 맞는지, 매개변수나 결과 이후 변수가 X에 섞이지 않았는지 확인하고 필요한 것만 바꾸십시오.||Roles are guessed from column names and value patterns only. Check Y and ID, and that no mediators or post-outcome variables are among the X, then change what you need.}}</p><div class="row"><button id="sug">{{추천 다시 적용||Reapply suggestions}}</button><button id="clr">{{모두 비우기||Clear all}}</button></div>
 <div class="row" style="margin-top:14px"><label>{{Y 유형 ||Y type }}<select id="kind"><option value="pos">{{양수 연속 (시간, 비용)||Positive continuous (time, cost)}}</option><option value="zeropos">{{0 포함 양수 연속||Non-negative continuous with zeros}}</option><option value="real">{{실수 연속 (음수 가능)||Real-valued (negatives allowed)}}</option><option value="count">{{카운트 (횟수)||Count}}</option><option value="prop">{{비율 (0~1)||Proportion (0-1)}}</option><option value="binary">{{이분형 (0/1)||Binary (0/1)}}</option><option value="trials">{{성공 수/시행 수||Successes / trials}}</option><option value="ordinal">{{순서형 (리커트)||Ordinal (Likert)}}</option></select></label>
 <label id="slw">{{랜덤 기울기 ||Random slope }}<select id="slope"></select></label></div>
 <div class="row" style="margin-top:8px"><label><input type="checkbox" id="inter">{{ X끼리 2원 교호작용 포함|| Include two-way interactions among X}}</label><label><input type="checkbox" id="zx">{{ 수치 X 표준화 (z점수)|| Standardize numeric X (z-scores)}}</label><label>{{Y 척도 ||Y scale }}<select id="zy"><option value="">raw Y</option><option value="1">{{표준화 (Gaussian만)||Standardized (Gaussian only)}}</option></select></label><label><input type="checkbox" id="links">{{ 링크 함수도 비교 (양수 연속)|| Also compare links (positive continuous)}}</label></div>
-<p id="zh" class="wa" hidden>{{△ Y를 표준화하면 음수가 생겨서 Gaussian 외의 분포는 쓰지 않아요. 링크 비교와 노출량도 꺼져요.||△ Standardized Y has negatives, so everything except Gaussian is disabled, including link comparison and exposure.}}</p><p id="kh" class="mut"></p><div class="row"><button class="pri" id="run">{{분포 한 번에 돌리기||Run all distributions}}</button><button id="stop" hidden>{{중단||Stop}}</button></div></div></div>
-<div id="res" hidden><h2>{{3. 비교 결과||3. Comparison}}</h2><div id="warn"></div><div id="reco" class="box"></div><div class="box tw" style="margin-top:12px"><table><thead><tr><th>{{분포||Distribution}}</th><th class="n">ΔAIC</th><th class="n">AIC</th><th class="n">AICc</th><th class="n">BIC</th><th class="n">{{모수||Params}}</th><th>{{진단||Diagnostics}}</th></tr></thead><tbody id="rb"></tbody></table><p class="mut">{{ΔAIC는 서로 비교할 수 있고 수렴한 후보 중 최솟값과의 차이예요. 작을수록 좋아요.||ΔAIC is the gap to the lowest AIC among comparable, converged candidates. Smaller is better.}}</p></div>
+<p id="zh" class="wa" hidden>{{△ Y를 표준화하면 음수가 생겨서 Gaussian 외의 분포는 쓰지 않습니다. 링크 비교와 노출량도 꺼집니다.||△ Standardized Y has negatives, so everything except Gaussian is disabled, including link comparison and exposure.}}</p><p id="kh" class="mut"></p><div class="row"><button class="pri" id="run">{{분포 한 번에 돌리기||Run all distributions}}</button><button id="stop" hidden>{{중단||Stop}}</button></div></div></div>
+<div id="res" hidden><h2>{{3. 비교 결과||3. Comparison}}</h2><div id="warn"></div><div id="reco" class="box"></div><div class="box tw" style="margin-top:12px"><table><thead><tr><th>{{분포||Distribution}}</th><th class="n">ΔAIC</th><th class="n">AIC</th><th class="n">AICc</th><th class="n">BIC</th><th class="n">{{모수||Params}}</th><th>{{진단||Diagnostics}}</th></tr></thead><tbody id="rb"></tbody></table><p class="mut">{{ΔAIC는 서로 비교할 수 있고 수렴한 후보 중 최솟값과의 차이입니다. 작을수록 좋습니다.||ΔAIC is the gap to the lowest AIC among comparable, converged candidates. Smaller is better.}}</p></div>
 <h2>{{4. 그래프||4. Plots}}</h2><details class="box" open><summary>{{Q-Q 플롯 읽는 법||How to read Q-Q plots}}</summary>
-<p><b>{{점이 대각선에 붙어 있을수록 그 분포가 잘 맞아요.||The closer the points are to the diagonal, the better the distribution fits.}}</b>{{ 대각선은 분포가 완벽할 때 잔차가 놓일 자리, 회색 띠는 우연히 벗어날 수 있는 범위(점별 95%)예요. 가로축은 기대값, 세로축은 실제값이고, 어떤 분포든 맞기만 하면 직선이 되도록 잔차를 변환해 두었어요. 그래서 Gamma든 Poisson이든 같은 방법으로 읽으면 돼요.|| The diagonal is where residuals land if the distribution is perfect; the gray band is what chance allows (pointwise 95%). Horizontal is expected, vertical is observed. Residuals are transformed so any correct distribution gives a straight line, which means Gamma and Poisson are read the same way.}}</p>
+<p><b>{{점이 대각선에 붙어 있을수록 그 분포가 잘 맞습니다.||The closer the points are to the diagonal, the better the distribution fits.}}</b>{{ 대각선은 분포가 완벽할 때 잔차가 놓일 자리, 회색 띠는 우연히 벗어날 수 있는 범위(점별 95%)입니다. 가로축은 기대값, 세로축은 실제값이고, 어떤 분포든 맞기만 하면 직선이 되도록 잔차를 변환해 두었습니다. 그래서 Gamma든 Poisson이든 같은 방법으로 읽으면 됩니다.|| The diagonal is where residuals land if the distribution is perfect; the gray band is what chance allows (pointwise 95%). Horizontal is expected, vertical is observed. Residuals are transformed so any correct distribution gives a straight line, which means Gamma and Poisson are read the same way.}}</p>
 <div id="pat"></div>
-<ul><li><b>{{완벽한 직선은 없어요.||No line is perfect.}}</b>{{ 표본이 작으면 양 끝 5% 정도는 조금 벗어나는 게 자연스러워요. 가운데 흐름을 먼저 보고, 후보 중 어느 쪽이 더 곧은지 비교하세요.|| In small samples the outer 5% at each end naturally drifts. Look at the middle first, then compare which candidate is straighter.}}</li>
-<li><b>{{계단 모양:||Staircases:}}</b>{{ 카운트나 이분형 Y의 보통 잔차에서는 정상적으로 나타나요. 이 앱은 무작위화 분위수 잔차를 써서 계단이 거의 없어요. 대신 0/1 자료는 분포가 틀려도 곧게 나올 수 있어요.|| normal for ordinary residuals of count or binary Y. This app uses randomized quantile residuals, so they mostly vanish. In exchange, 0/1 data can look straight even when the model is wrong.}}</li>
-<li><b>{{띠는 어림값이에요.||The band is approximate.}}</b>{{ 잔차가 서로 독립이라고 보고 그려서 반복측정 자료에서는 띠 밖으로 더 쉽게 나가요.|| It assumes independent residuals, so repeated-measures data leave it more easily.}}</li>
-<li><b>{{Q-Q만으로 정하지 마세요.||Do not decide on Q-Q alone.}}</b>{{ 퍼짐이 예측값에 따라 달라지는 문제는 아래 가운데 그래프에서, 상대 순위는 ΔAIC에서 확인하세요.|| Check changing spread in the middle plot below, and relative ranking in ΔAIC.}}</li></ul></details>
-<h3 style="margin:18px 0 6px">{{분포별 Q-Q 한눈에||Q-Q plots at a glance}}</h3><div id="qq"></div><h3 style="margin:24px 0 0">{{분포별 자세히||Details by distribution}}</h3><div class="lg"><span><i style="background:var(--s1)"></i>{{실제 데이터||Observed data}}</span><span><i style="background:var(--s2);opacity:.45"></i>{{모델 시뮬레이션 5~95% 범위||Model simulation, 5-95% range}}</span><span>{{점선: 이상적인 경우||Dashed: ideal}}</span></div><p class="mut" style="margin-top:8px">{{왼쪽은 점이 대각선에, 가운데는 위아래로 고르게, 오른쪽은 막대가 주황 범위 안에 있으면 잘 맞는 거예요.||Good fit: points on the diagonal (left), evenly spread (middle), bar tops inside the orange range (right).}}</p><div id="cards"></div></div>
+<ul><li><b>{{완벽한 직선은 없습니다.||No line is perfect.}}</b>{{ 표본이 작으면 양 끝 5% 정도는 조금 벗어나는 것이 자연스럽습니다. 가운데 흐름을 먼저 보고, 후보 중 어느 쪽이 더 곧은지 비교하십시오.|| In small samples the outer 5% at each end naturally drifts. Look at the middle first, then compare which candidate is straighter.}}</li>
+<li><b>{{계단 모양:||Staircases:}}</b>{{ 카운트나 이분형 Y의 보통 잔차에서는 정상적으로 나타납니다. 이 앱은 무작위화 분위수 잔차를 써서 계단이 거의 없습니다. 대신 0/1 자료는 분포가 틀려도 곧게 나올 수 있습니다.|| normal for ordinary residuals of count or binary Y. This app uses randomized quantile residuals, so they mostly vanish. In exchange, 0/1 data can look straight even when the model is wrong.}}</li>
+<li><b>{{띠는 어림값입니다.||The band is approximate.}}</b>{{ 잔차가 서로 독립이라고 보고 그려서 반복측정 자료에서는 띠 밖으로 더 쉽게 나갑니다.|| It assumes independent residuals, so repeated-measures data leave it more easily.}}</li>
+<li><b>{{Q-Q만으로 정하지 마십시오.||Do not decide on Q-Q alone.}}</b>{{ 퍼짐이 예측값에 따라 달라지는 문제는 아래 가운데 그래프에서, 상대 순위는 ΔAIC에서 확인하십시오.|| Check changing spread in the middle plot below, and relative ranking in ΔAIC.}}</li></ul></details>
+<h3 style="margin:18px 0 6px">{{분포별 Q-Q 한눈에||Q-Q plots at a glance}}</h3><div id="qq"></div><h3 style="margin:24px 0 0">{{분포별 자세히||Details by distribution}}</h3><div class="lg"><span><i style="background:var(--s1)"></i>{{실제 데이터||Observed data}}</span><span><i style="background:var(--s2);opacity:.45"></i>{{모델 시뮬레이션 5~95% 범위||Model simulation, 5-95% range}}</span><span>{{점선: 이상적인 경우||Dashed: ideal}}</span></div><p class="mut" style="margin-top:8px">{{왼쪽은 점이 대각선에, 가운데는 위아래로 고르게, 오른쪽은 막대가 주황 범위 안에 있으면 잘 맞는 것입니다.||Good fit: points on the diagonal (left), evenly spread (middle), bar tops inside the orange range (right).}}</p><div id="cards"></div></div>
 <div id="fin" hidden><h2>{{5. 확정한 모델||5. Chosen model}}</h2><div class="box"><div id="fb"></div></div></div>
 </main>
 <script type="text/plain" id="engine"># GLM 분포 비교 엔진. webR(브라우저)와 일반 R에서 모두 실행 가능.
@@ -166,49 +166,49 @@ setup <- function(cfgjson) {
   off <- if (length(cfg$off)) v(cfg$off); tr <- if (length(cfg$tri)) v(cfg$tri)
   d <- S$raw[c(yv, num, fac, re, off, tr)]; n0 <- nrow(d); d <- d[complete.cases(d), , drop = FALSE]
   warn <- character(); kind <- cfg$kind
-  if (nrow(d) < 10) stop("{{결측을 뺀 행이 10개 미만이에요.||Fewer than 10 rows remain after removing missing values.}}")
-  for (k in c(num, off, tr)) if (!is.numeric(d[[k]])) stop(bf("{{'%s' 열은 숫자가 아니에요.||Column '%s' is not numeric.}}", lab(k)))
+  if (nrow(d) < 10) stop("{{결측을 뺀 행이 10개 미만입니다.||Fewer than 10 rows remain after removing missing values.}}")
+  for (k in c(num, off, tr)) if (!is.numeric(d[[k]])) stop(bf("{{'%s' 열은 숫자가 아닙니다.||Column '%s' is not numeric.}}", lab(k)))
   if (kind == "ordinal") {
-    if (!is.numeric(d[[yv]])) stop("{{순서형 Y는 1, 2, 3처럼 숫자로 코딩해 주세요.||Please code ordinal Y as numbers such as 1, 2, 3.}}")
-    if (length(unique(d[[yv]])) < 3) stop("{{순서형 Y는 단계가 3개 이상이어야 해요.||Ordinal Y needs at least 3 levels.}}")
+    if (!is.numeric(d[[yv]])) stop("{{순서형 Y는 1, 2, 3처럼 숫자로 코딩해 주십시오.||Please code ordinal Y as numbers such as 1, 2, 3.}}")
+    if (length(unique(d[[yv]])) < 3) stop("{{순서형 Y는 단계가 3개 이상이어야 합니다.||Ordinal Y needs at least 3 levels.}}")
   } else if (kind == "binary") {
-    u <- sort(unique(d[[yv]])); if (length(u) != 2) stop("{{이분형 Y는 값이 두 종류여야 해요.||Binary Y must have exactly two values.}}")
+    u <- sort(unique(d[[yv]])); if (length(u) != 2) stop("{{이분형 Y는 값이 두 종류여야 합니다.||Binary Y must have exactly two values.}}")
     S$succ <- u[2]; d[[yv]] <- as.integer(d[[yv]] == u[2])
-    if (!is.numeric(u) || any(u != c(0, 1))) warn <- c(warn, bf("{{Y의 '%s'를 1(성공)로 두었어요.||'%s' in Y is treated as 1 (success).}}", u[2]))
-  } else if (!is.numeric(d[[yv]])) stop("{{Y가 숫자가 아니에요.||Y is not numeric.}}")
+    if (!is.numeric(u) || any(u != c(0, 1))) warn <- c(warn, bf("{{Y의 '%s'를 1(성공)로 두었습니다.||'%s' in Y is treated as 1 (success).}}", u[2]))
+  } else if (!is.numeric(d[[yv]])) stop("{{Y가 숫자가 아닙니다.||Y is not numeric.}}")
   y <- d[[yv]]; int <- all(abs(y - round(y)) < 1e-9)
-  if (any(!is.finite(y))) stop("{{Y에 무한대 값이 있어요.||Y contains infinite values.}}")
+  if (any(!is.finite(y))) stop("{{Y에 무한대 값이 있습니다.||Y contains infinite values.}}")
   bad <- switch(kind, pos = any(y <= 0), zeropos = any(y < 0), count = any(y < 0) || !int,
     prop = any(y < 0 | y > 1), FALSE)
-  if (bad) stop("{{Y 값이 고른 유형과 맞지 않아요 (음수, 0, 소수 여부를 확인해 주세요).||Y does not match the selected type (check for negatives, zeros or decimals).}}")
+  if (bad) stop("{{Y 값이 고른 유형과 맞지 않습니다 (음수, 0, 소수 여부를 확인해 주십시오).||Y does not match the selected type (check for negatives, zeros or decimals).}}")
   if (kind == "trials") {
-    if (is.null(tr)) stop("{{시행 수 열을 지정해 주세요.||Please assign a trials column.}}")
-    if (!int || any(y < 0 | y > d[[tr]]) || any(d[[tr]] < 1 | d[[tr]] %% 1 != 0)) stop("{{성공 수/시행 수 값이 잘못됐어요.||Invalid successes/trials values.}}")
+    if (is.null(tr)) stop("{{시행 수 열을 지정해 주십시오.||Please assign a trials column.}}")
+    if (!int || any(y < 0 | y > d[[tr]]) || any(d[[tr]] < 1 | d[[tr]] %% 1 != 0)) stop("{{성공 수/시행 수 값이 잘못됐습니다.||Invalid successes/trials values.}}")
   }
-  if (length(unique(y)) < 2) stop("{{Y 값이 모두 같아요.||All Y values are identical.}}")
+  if (length(unique(y)) < 2) stop("{{Y 값이 모두 같습니다.||All Y values are identical.}}")
   if (!is.null(off)) {
-    if (any(d[[off]] <= 0)) stop("{{노출량은 0보다 커야 해요.||Exposure must be greater than 0.}}")
-    if (!kind %in% c("pos", "zeropos", "count")) stop("{{노출량은 로그 링크를 쓰는 Y 유형에서만 쓸 수 있어요.||Exposure is only available for Y types that use a log link.}}")
+    if (any(d[[off]] <= 0)) stop("{{노출량은 0보다 커야 합니다.||Exposure must be greater than 0.}}")
+    if (!kind %in% c("pos", "zeropos", "count")) stop("{{노출량은 로그 링크를 쓰는 Y 유형에서만 쓸 수 있습니다.||Exposure is only available for Y types that use a log link.}}")
   }
   for (k in c(fac, re)) d[[k]] <- droplevels(factor(d[[k]]))
-  for (k in c(fac, re)) if (nlevels(d[[k]]) < 2) stop(bf("{{'%s'의 수준이 하나뿐이에요.||'%s' has only one level.}}", lab(k)))
-  for (k in num) if (length(unique(d[[k]])) < 2) stop(bf("{{'%s' 값이 모두 같아요.||All values of '%s' are identical.}}", lab(k)))
+  for (k in c(fac, re)) if (nlevels(d[[k]]) < 2) stop(bf("{{'%s'의 수준이 하나뿐입니다.||'%s' has only one level.}}", lab(k)))
+  for (k in num) if (length(unique(d[[k]])) < 2) stop(bf("{{'%s' 값이 모두 같습니다.||All values of '%s' are identical.}}", lab(k)))
   S$zx <- if (isTRUE(cfg$zx)) num else character(); S$zy <- isTRUE(cfg$zy)
   for (k in S$zx) d[[k]] <- as.numeric(scale(d[[k]]))
   if (S$zy) {
-    if (kind %in% c("binary", "trials", "ordinal")) stop("{{이 Y 유형은 표준화할 수 없어요.||This Y type cannot be standardized.}}")
-    if (!is.null(off)) stop("{{Y를 표준화하면 노출량(offset)은 쓸 수 없어요.||Exposure (offset) cannot be used with standardized Y.}}")
+    if (kind %in% c("binary", "trials", "ordinal")) stop("{{이 Y 유형은 표준화할 수 없습니다.||This Y type cannot be standardized.}}")
+    if (!is.null(off)) stop("{{Y를 표준화하면 노출량(offset)은 쓸 수 없습니다.||Exposure (offset) cannot be used with standardized Y.}}")
     d[[yv]] <- y <- as.numeric(scale(y))
-    warn <- c(warn, "{{Y를 표준화해서 Gaussian만 돌렸어요. 표준화해도 분포 모양은 그대로라 치우친 Y가 정규분포가 되지는 않아요.||Y is standardized, so only Gaussian was run. Standardizing keeps the shape: a skewed Y does not become normal.}}")
-    if (kind %in% c("count", "prop", "zeropos")) warn <- c(warn, "{{원래 Y가 횟수, 비율, 0이 섞인 값이라 Gaussian이 부적절할 수 있어요. raw Y로도 비교해 보세요.||The original Y is a count, proportion or zero-mixed value, so Gaussian may be inappropriate. Compare with raw Y too.}}")
+    warn <- c(warn, "{{Y를 표준화해서 Gaussian만 돌렸습니다. 표준화해도 분포 모양은 그대로라 치우친 Y가 정규분포가 되지는 않습니다.||Y is standardized, so only Gaussian was run. Standardizing keeps the shape: a skewed Y does not become normal.}}")
+    if (kind %in% c("count", "prop", "zeropos")) warn <- c(warn, "{{원래 Y가 횟수, 비율, 0이 섞인 값이라 Gaussian이 부적절할 수 있습니다. raw Y로도 비교해 보십시오.||The original Y is a count, proportion or zero-mixed value, so Gaussian may be inappropriate. Compare with raw Y too.}}")
   }
-  if (length(S$zx)) warn <- c(warn, "{{수치 X를 분석에 쓴 행의 평균과 표준편차로 표준화했어요. 계수는 X가 1 SD 늘 때의 변화예요.||Numeric X were standardized with the mean and SD of the analyzed rows. Coefficients are changes per 1 SD of X.}}")
+  if (length(S$zx)) warn <- c(warn, "{{수치 X를 분석에 쓴 행의 평균과 표준편차로 표준화했습니다. 계수는 X가 1 SD 늘 때의 변화입니다.||Numeric X were standardized with the mean and SD of the analyzed rows. Coefficients are changes per 1 SD of X.}}")
   rhsx <- c(num, fac)
   rhs <- if (!length(rhsx)) "1" else if (isTRUE(cfg$inter) && length(rhsx) > 1)
     sprintf("(%s)^2", paste(rhsx, collapse = " + ")) else paste(rhsx, collapse = " + ")
   slope <- if (length(cfg$slope)) v(cfg$slope)
-  if (kind == "ordinal" && !is.null(slope)) { slope <- NULL; warn <- c(warn, "{{순서형에서는 랜덤 기울기를 지원하지 않아 랜덤 절편만 썼어요.||Random slopes are not supported for ordinal Y; only random intercepts were used.}}") }
-  if (!is.null(slope) && !(slope %in% rhsx)) stop("{{랜덤 기울기 변수는 X에도 있어야 해요.||The random slope variable must also be an X.}}")
+  if (kind == "ordinal" && !is.null(slope)) { slope <- NULL; warn <- c(warn, "{{순서형에서는 랜덤 기울기를 지원하지 않아 랜덤 절편만 썼습니다.||Random slopes are not supported for ordinal Y; only random intercepts were used.}}") }
+  if (!is.null(slope) && !(slope %in% rhsx)) stop("{{랜덤 기울기 변수는 X에도 있어야 합니다.||The random slope variable must also be an X.}}")
   ret <- if (length(re)) paste(sprintf("(1%s | %s)", if (is.null(slope)) "" else paste(" +", slope), re), collapse = " + ")
   S$tr <- tr; S$slope <- slope; S$off <- off; S$rhs <- rhs; S$re <- re; S$yv <- yv; S$kind <- kind; S$d <- d; S$y <- y
   lhs <- if (kind == "trials") sprintf("cbind(%s, %s - %s)", yv, tr, yv) else yv
@@ -217,28 +217,28 @@ setup <- function(cfgjson) {
   if (S$zy) { dis <- lapply(S$L, `[[`, "name"); dis <- dis[dis != "Gaussian"]
     S$L <- list(cand("Gaussian", "gaussian()", link = "identity")) }
   X <- model.matrix(as.formula(paste("~", rhs)), d); p <- ncol(X); n <- nrow(d)
-  if (qr(X)$rank < p) stop("{{X끼리 완전히 겹치는 조합이 있어 계수를 추정할 수 없어요. 변수나 교호작용을 줄여 주세요.||Some X are perfectly collinear, so coefficients cannot be estimated. Remove variables or interactions.}}")
-  if (n0 > n) warn <- c(warn, bf("{{결측 때문에 %d행을 뺐어요. 모든 분포를 같은 %d행으로 비교해요.||%d rows were dropped for missing values. All distributions are compared on the same %d rows.}}", n0 - n, n))
+  if (qr(X)$rank < p) stop("{{X끼리 완전히 겹치는 조합이 있어 계수를 추정할 수 없습니다. 변수나 교호작용을 줄여 주십시오.||Some X are perfectly collinear, so coefficients cannot be estimated. Remove variables or interactions.}}")
+  if (n0 > n) warn <- c(warn, bf("{{결측 때문에 %d행을 뺐습니다. 모든 분포를 같은 %d행으로 비교합니다.||%d rows were dropped for missing values. All distributions are compared on the same %d rows.}}", n0 - n, n))
   eff <- if (kind == "binary") min(table(y)) else n
-  if (eff / p < 10) warn <- c(warn, bf("{{데이터가 적어요 (유효 관측 %d개, 고정효과 계수 %d개). 분포 순위가 불안정할 수 있어요.||Small data (%d effective observations, %d fixed coefficients). The ranking may be unstable.}}", as.integer(eff), p))
-  if (n > 5000) warn <- c(warn, "{{표본이 커서 작은 어긋남도 유의하게 나와요. p값보다 그래프와 어긋난 크기를 보세요.||With a large sample even tiny misfit is significant. Look at the plots and the size of the misfit rather than p-values.}}")
+  if (eff / p < 10) warn <- c(warn, bf("{{데이터가 적습니다 (유효 관측 %d개, 고정효과 계수 %d개). 분포 순위가 불안정할 수 있습니다.||Small data (%d effective observations, %d fixed coefficients). The ranking may be unstable.}}", as.integer(eff), p))
+  if (n > 5000) warn <- c(warn, "{{표본이 커서 작은 어긋남도 유의하게 나옵니다. p값보다 그래프와 어긋난 크기를 보십시오.||With a large sample even tiny misfit is significant. Look at the plots and the size of the misfit rather than p-values.}}")
   for (k in re) {
-    if (nlevels(d[[k]]) < 5) warn <- c(warn, bf("{{랜덤효과 '%s'의 집단이 %d개뿐이라 분산 추정이 불안정해요.||Random effect '%s' has only %d groups, so its variance estimate is unstable.}}", lab(k), nlevels(d[[k]])))
-    if (nlevels(d[[k]]) == n) warn <- c(warn, bf("{{'%s'는 행마다 값이 달라요. 관측 단위 랜덤효과라 잔차 분산과 구분되지 않을 수 있어요.||'%s' differs on every row. As an observation-level random effect it may not be separable from residual variance.}}", lab(k)))
+    if (nlevels(d[[k]]) < 5) warn <- c(warn, bf("{{랜덤효과 '%s'의 집단이 %d개뿐이라 분산 추정이 불안정합니다.||Random effect '%s' has only %d groups, so its variance estimate is unstable.}}", lab(k), nlevels(d[[k]])))
+    if (nlevels(d[[k]]) == n) warn <- c(warn, bf("{{'%s'는 행마다 값이 다릅니다. 관측 단위 랜덤효과라 잔차 분산과 구분되지 않을 수 있습니다.||'%s' differs on every row. As an observation-level random effect it may not be separable from residual variance.}}", lab(k)))
   }
-  if (length(re) && kind == "pos" && !S$zy) warn <- c(warn, "{{Inverse Gaussian은 랜덤효과가 있으면 같은 기준의 우도를 얻기 어려워 뺐어요.||Inverse Gaussian was left out: with random effects a likelihood on the same footing is hard to obtain.}}")
-  if (!length(re)) warn <- c(warn, "{{랜덤효과가 없어요. 한 사람/집단에서 여러 번 측정했다면 ID를 랜덤효과로 넣어야 해요.||No random effect. If the same person or group was measured repeatedly, add its ID as a random effect.}}")
-  if (kind == "binary") warn <- c(warn, "{{0/1 자료의 분포는 이항분포로 정해져 있어요. 여기서 비교하는 건 링크 함수이고, 분포 진단으로는 문제를 잘 못 잡아요.||0/1 data are always binomial. What is compared here is the link function, and distribution diagnostics detect little.}}")
+  if (length(re) && kind == "pos" && !S$zy) warn <- c(warn, "{{Inverse Gaussian은 랜덤효과가 있으면 같은 기준의 우도를 얻기 어려워 뺐습니다.||Inverse Gaussian was left out: with random effects a likelihood on the same footing is hard to obtain.}}")
+  if (!length(re)) warn <- c(warn, "{{랜덤효과가 없습니다. 한 사람/집단에서 여러 번 측정했다면 ID를 랜덤효과로 넣어야 합니다.||No random effect. If the same person or group was measured repeatedly, add its ID as a random effect.}}")
+  if (kind == "binary") warn <- c(warn, "{{0/1 자료의 분포는 이항분포로 정해져 있습니다. 여기서 비교하는 것은 링크 함수이고, 분포 진단으로는 문제를 잘 못 잡습니다.||0/1 data are always binomial. What is compared here is the link function, and distribution diagnostics detect little.}}")
   if (kind == "ordinal") {
     gap <- setdiff(seq(min(y), max(y)), y)
-    if (int && length(gap)) warn <- c(warn, bf("{{중간 단계 %s은(는) 응답이 없어서, 나온 단계끼리 이어서 계산해요.||Level(s) %s were never chosen; the observed levels are treated as adjacent.}}", paste(gap, collapse = ", ")))
+    if (int && length(gap)) warn <- c(warn, bf("{{중간 단계 %s은(는) 응답이 없어서, 나온 단계끼리 이어서 계산합니다.||Level(s) %s were never chosen; the observed levels are treated as adjacent.}}", paste(gap, collapse = ", ")))
     for (k in fac) { one <- names(which(tapply(y, d[[k]], function(v) all(v == min(y)) || all(v == max(y)))))
-      if (length(one)) warn <- c(warn, bf("{{'%s'의 %s은(는) 응답이 모두 척도 끝값이라 계수와 표준오차가 매우 커질 수 있어요.||In '%s', %s has only end-of-scale responses, so its coefficient and standard error may blow up.}}", lab(k), paste(one, collapse = ", "))) }
+      if (length(one)) warn <- c(warn, bf("{{'%s'의 %s은(는) 응답이 모두 척도 끝값이라 계수와 표준오차가 매우 커질 수 있습니다.||In '%s', %s has only end-of-scale responses, so its coefficient and standard error may blow up.}}", lab(k), paste(one, collapse = ", "))) }
     if (int && length(fac)) { part <- unique(unlist(lapply(fac, function(k) names(which(tapply(y, d[[k]], function(v) length(unique(v))) < length(unique(y)))))))
-      if (length(part)) warn <- c(warn, "{{일부 문항이나 집단에서는 안 쓰인 단계가 있어요. 정상이고, 전체 데이터의 단계를 함께 써서 계산해요.||Some items or groups do not use every level. That is fine: the levels of the whole data are shared.}}") }
+      if (length(part)) warn <- c(warn, "{{일부 문항이나 집단에서는 안 쓰인 단계가 있습니다. 정상이고, 전체 데이터의 단계를 함께 써서 계산합니다.||Some items or groups do not use every level. That is fine: the levels of the whole data are shared.}}") }
   }
-  if (kind == "ordinal") warn <- c(warn, "{{누적 모형의 비례 가정은 이 앱이 검사하지 않아요. ordinal::nominal_test 등으로 따로 확인하세요.||This app does not test the proportionality assumption of cumulative models. Check it separately, e.g. with ordinal::nominal_test.}}")
-  if (kind == "pos" && int) warn <- c(warn, "{{Y가 정수예요. 횟수라면 유형을 카운트로 바꾸고, 밀리초처럼 반올림된 측정값이면 그대로 두세요.||Y is integer-valued. If it is a count, switch the type to Count; if it is a rounded measure such as milliseconds, keep it.}}")
+  if (kind == "ordinal") warn <- c(warn, "{{누적 모형의 비례 가정은 이 앱이 검사하지 않습니다. ordinal::nominal_test 등으로 따로 확인하십시오.||This app does not test the proportionality assumption of cumulative models. Check it separately, e.g. with ordinal::nominal_test.}}")
+  if (kind == "pos" && int) warn <- c(warn, "{{Y가 정수입니다. 횟수라면 유형을 카운트로 바꾸고, 밀리초처럼 반올림된 측정값이면 그대로 두십시오.||Y is integer-valued. If it is a count, switch the type to Count; if it is a rounded measure such as milliseconds, keep it.}}")
   js(list(n = n, warn = I(warn), formula = S$f, disabled = I(dis), cands = I(lapply(S$L, `[`, c("name", "note", "cmp")))))
 }
 
@@ -498,7 +498,7 @@ py_for <- function(i, file, sep = ",", enc = "UTF-8") {
   if (is.null(body)) {
     r <- strsplit(code_for(i, file, sep, enc), "\n")[[1]]
     r <- r[!grepl("^plot\\(|^testDispersion|^summary\\(m\\)$", r)]; r <- sub("; library(DHARMa)", "", r, fixed = TRUE)
-    if (any(grepl("'''", r, fixed = TRUE))) return(js(list(code = "# {{열 이름에 따옴표가 있어 Python 코드를 만들 수 없어요. 열 이름을 바꿔 주세요.||Cannot build Python code because a column name contains quotes. Please rename it.}}", native = FALSE)))
+    if (any(grepl("'''", r, fixed = TRUE))) return(js(list(code = "# {{열 이름에 따옴표가 있어 Python 코드를 만들 수 없습니다. 열 이름을 바꿔 주십시오.||Cannot build Python code because a column name contains quotes. Please rename it.}}", native = FALSE)))
     out <- c(sprintf("# %s", n), "# {{Python(statsmodels)에는 같은 모형이 없어서 rpy2로 R의 모형을 그대로 부릅니다.||statsmodels has no reliable equivalent, so this calls the same R model through rpy2.}}",
       "# {{준비: R 설치, R에서 install.packages(c(\"glmmTMB\", \"ordinal\")), 터미널에서 pip install rpy2||Setup: install R, run install.packages(c(\"glmmTMB\", \"ordinal\")) in R, then pip install rpy2 in a terminal}}",
       "import rpy2.robjects as ro", "", "ro.r(r'''", r, "''')", "print(ro.r(\"summary(m)\"))")
@@ -539,14 +539,14 @@ const st=t=>$('#st').innerHTML=t;
 const R=(c)=>w.evalRString(c), q=s=>JSON.stringify(s);
 const err=e=>{const t=String(e.message||e),m=t.match(/\{\{[\s\S]*\}\}/);return m?m[0]:t};
 function boot(){return ready??=(async()=>{
-  st('{{R을 불러오는 중… 처음에는 1분쯤 걸려요.||Loading R… the first time takes about a minute.}}');
+  st('{{R을 불러오는 중… 처음에는 1분쯤 걸립니다.||Loading R… the first time takes about a minute.}}');
   const {WebR,ChannelType}=await import('https://webr.r-wasm.org/v0.5.8/webr.mjs');
   w=new WebR({channelType:ChannelType.PostMessage});await w.init();
-  for(const p of ['glmmTMB','jsonlite','statmod','ordinal']){st(`{{R 패키지 설치 중: ${p} (브라우저 안에만 설치돼요)||Installing R package: ${p} (inside this browser only)}}`);await w.installPackages([p],{quiet:true});}
+  for(const p of ['glmmTMB','jsonlite','statmod','ordinal']){st(`{{R 패키지 설치 중: ${p} (브라우저 안에만 설치됩니다)||Installing R package: ${p} (inside this browser only)}}`);await w.installPackages([p],{quiet:true});}
   await w.evalRVoid($('#engine').textContent.replace(/\r/g,''));
-  st('{{준비됐어요.||Ready.}}');
+  st('{{준비됐습니다.||Ready.}}');
 })()}
-const start=boot();start.catch(e=>st('<span class="er">{{R을 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.||Could not load R. Check your connection and refresh.}} '+esc(err(e))+'</span>'));
+const start=boot();start.catch(e=>st('<span class="er">{{R을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침해 주십시오.||Could not load R. Check your connection and refresh.}} '+esc(err(e))+'</span>'));
 async function lock(f){if(busy)return;busy=true;document.querySelectorAll('button:not(#stop),#file').forEach(b=>b.dataset.lang||(b.disabled=true));
   try{await start;await f()}catch(e){st('<span class="er">'+esc(err(e))+'</span>')}finally{busy=false;document.querySelectorAll('button,#file').forEach(b=>b.disabled=false)}}
 let longN=0;
@@ -556,7 +556,7 @@ async function load(text,name,en='UTF-8',np=0){longN=np;
   meta=JSON.parse(await R(`load_csv("/tmp/d.csv",${q(sep)})`));
   $('#dinfo').textContent=`{{${name}: ${meta.n}행, ${meta.cols.length}열||${name}: ${meta.n} rows, ${meta.cols.length} columns}}`;
   $('#vb').innerHTML=meta.cols.map((c,i)=>`<tr><td>${esc(c.label)}</td><td class="mut">${esc(c.range)}</td><td class="n">${c.uniq}</td><td class="n">${c.missing}</td><td><select data-i="${i+1}" aria-label="{{${esc(c.label)} 역할||Role of ${esc(c.label)}}}"><option value="">{{사용 안 함||Not used}}</option><option value="y">{{Y (결과)||Y (outcome)}}</option>${c.numeric?'<option value="num">{{X 수치||X numeric}}</option>':''}<option value="fac">{{X 범주||X categorical}}</option><option value="re">{{랜덤효과 (ID, 집단)||Random effect (ID, group)}}</option>${c.numeric?'<option value="off">{{노출량 (offset)||Exposure (offset)}}</option><option value="tri">{{시행 수||Trials}}</option>':''}</select></td><td class="mut" data-w="${i+1}"></td></tr>`).join('');
-  $('#vars').hidden=false;$('#res').hidden=$('#fin').hidden=true;fill();if(np){$('#wide').hidden=true}else askWide();st('{{데이터를 불러왔어요. 추천 역할을 확인해 주세요.||Data loaded. Check the suggested roles.}}');
+  $('#vars').hidden=false;$('#res').hidden=$('#fin').hidden=true;fill();if(np){$('#wide').hidden=true}else askWide();st('{{데이터를 불러왔습니다. 추천 역할을 확인해 주십시오.||Data loaded. Check the suggested roles.}}');
 }
 // 역할 추천: 이름(단어 단위)과 값의 모양만 본다
 function wideCols(){ // 같은 척도의 정수 문항이 4개 이상이고 ID가 반복되지 않으면 wide로 본다
@@ -569,10 +569,10 @@ function wideCols(){ // 같은 척도의 정수 문항이 4개 이상이고 ID�
   return g.length>=4&&meta.n<=5000&&!suggest().out.some(o=>o[0]==='re')?g:[]}
 function askWide(){const g=wideCols(),el=$('#wide');el.hidden=!g.length;if(!g.length)return el.innerHTML='';
   const opt=meta.cols.map((c,i)=>({c,i:i+1})).filter(({c})=>c.numeric&&c.int&&c.max<=100);
-  el.innerHTML=`<b>{{한 행에 한 사람, 문항이 여러 열인 wide 형식 같아요.||This looks like wide format: one row per person, items in columns.}}</b><p>{{문항들을 비교하거나 함께 분석하려면 long 형식으로 바꾸세요. 바꾸면 응답값이 Y, 문항이 X, 사람이 랜덤효과가 돼요. 문항 하나만 Y로 쓸 거면 그대로 두면 돼요.||To compare or pool items, convert to long format: the response becomes Y, the item X, and the person a random effect. If a single item is your Y, leave it as is.}}</p><details><summary>{{문항 열 고르기||Choose item columns}} (<span id="wn">${g.length}</span>)</summary><p class="wa">△ {{같은 질문과 같은 척도로 잰 열만 고르세요. 뜻이 다른 열을 섞으면 결과가 의미 없어요.||Select only columns asking the same question on the same scale. Mixing different measures makes results meaningless.}}</p><div class="row">${opt.map(o=>`<label><input type="checkbox" data-wc="${o.i}" ${g.includes(o.i)?'checked':''}> ${esc(o.c.label)}</label>`).join('')}</div></details><p><button class="pri" id="wgo">{{long 형식으로 바꾸기||Convert to long}}</button></p>`;
+  el.innerHTML=`<b>{{한 행에 한 사람, 문항이 여러 열인 wide 형식 같습니다.||This looks like wide format: one row per person, items in columns.}}</b><p>{{문항들을 비교하거나 함께 분석하려면 long 형식으로 바꾸십시오. 바꾸면 응답값이 Y, 문항이 X, 사람이 랜덤효과가 됩니다. 문항 하나만 Y로 쓸 경우에는 그대로 두면 됩니다.||To compare or pool items, convert to long format: the response becomes Y, the item X, and the person a random effect. If a single item is your Y, leave it as is.}}</p><details><summary>{{문항 열 고르기||Choose item columns}} (<span id="wn">${g.length}</span>)</summary><p class="wa">△ {{같은 질문과 같은 척도로 잰 열만 고르십시오. 뜻이 다른 열을 섞으면 결과가 의미 없습니다.||Select only columns asking the same question on the same scale. Mixing different measures makes results meaningless.}}</p><div class="row">${opt.map(o=>`<label><input type="checkbox" data-wc="${o.i}" ${g.includes(o.i)?'checked':''}> ${esc(o.c.label)}</label>`).join('')}</div></details><p><button class="pri" id="wgo">{{long 형식으로 바꾸기||Convert to long}}</button></p>`;
   const sel=()=>[...document.querySelectorAll('[data-wc]:checked')].map(x=>+x.dataset.wc);
   el.onchange=()=>{$('#wn').textContent=sel().length};
-  $('#wgo').onclick=()=>lock(async()=>{const c=sel();if(c.length<2)throw Error('{{문항 열을 2개 이상 고르세요.||Select at least two item columns.}}');
+  $('#wgo').onclick=()=>lock(async()=>{const c=sel();if(c.length<2)throw Error('{{문항 열을 2개 이상 고르십시오.||Select at least two item columns.}}');
     const id=meta.cols.findIndex((m,i)=>!c.includes(i+1)&&m.uniq===meta.n&&m.missing===0&&/^(id|pid|.*id|participant|subject|respondent|참가자.*|참여자.*|피험자.*|응답자.*)$/i.test(m.label.trim()))+1;
     const np=meta.n,t=await R(`to_long(c(${c.join(',')}), ${id})`);await load(t,file.replace(/\.\w+$/,'')+'_long.csv','UTF-8',np);demo=t})}
 function suggest(){
@@ -609,7 +609,7 @@ function suggest(){
 }
 function fill(){const{out,tri}=suggest();if(!longN&&wideCols().length&&!out.some(o=>o[0]==='y'&&o[1].includes('흔한')))out.forEach(o=>{o[0]='';o[1]='{{wide 형식 같음: 변환하거나 직접 선택||looks wide: convert or choose yourself}}'});$('#kh').textContent='';document.querySelectorAll('#vb select').forEach(s=>{const o=out[s.dataset.i-1];s.value=o[0];$(`[data-w="${s.dataset.i}"]`).textContent=o[1]});
   const y=[...document.querySelectorAll('#vb select')].find(s=>s.value==='y');if(y)setKind(y);if(tri)$('#kind').value='trials';upd()}
-function setKind(s){const k=meta.cols[s.dataset.i-1].kind;if(k!=='none'){$('#kind').value=k;$('#kh').textContent='{{Y 값을 보고 유형을 골라 뒀어요. 맞는지 꼭 확인해 주세요.||The type was guessed from Y. Please check that it is right.}}'}}
+function setKind(s){const k=meta.cols[s.dataset.i-1].kind;if(k!=='none'){$('#kind').value=k;$('#kh').textContent='{{Y 값을 보고 유형을 골라 뒀습니다. 맞는지 꼭 확인해 주십시오.||The type was guessed from Y. Please check that it is right.}}'}}
 $('#sug').onclick=fill;$('#clr').onclick=()=>{document.querySelectorAll('#vb select').forEach(s=>{s.value='';$(`[data-w="${s.dataset.i}"]`).textContent=''});upd()};
 const roles=()=>{const o={y:[],num:[],fac:[],re:[],off:[],tri:[]};document.querySelectorAll('#vb select').forEach(s=>s.value&&o[s.value].push(+s.dataset.i));return o};
 function upd(){const r=roles();const sl=$('#slope'),v=sl.value;sl.innerHTML='<option value="">{{없음 (절편만)||None (intercept only)}}</option>'+[...r.num,...r.fac].map(i=>`<option value="${i}">${esc(meta.cols[i-1].label)}</option>`).join('');sl.value=[...r.num,...r.fac].includes(+v)?v:'';$('#slw').hidden=!r.re.length;
@@ -622,9 +622,9 @@ $('#vb').onchange=e=>{const s=e.target;if(['y','off','tri'].includes(s.value))do
   if(s.value==='tri')$('#kind').value='trials';upd()};
 $('#file').onchange=e=>{const f=e.target.files[0];if(f)lock(async()=>{const b=await f.arrayBuffer();let t,en='UTF-8';try{t=new TextDecoder('utf-8',{fatal:true}).decode(b)}catch{t=new TextDecoder('euc-kr').decode(b);en='CP949'}await load(t,f.name,en)})};
 document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=()=>lock(async()=>{const k=b.dataset.demo;const t=await R(`demo_csv("${k}")`);await load(t,k+'.csv');demo=t;}));
-$('#stop').onclick=()=>{stop=true;st('{{지금 돌리는 분포까지만 끝내고 멈출게요.||Stopping after the current distribution.}}')};
+$('#stop').onclick=()=>{stop=true;st('{{지금 돌리는 분포까지만 끝내고 멈추겠습니다.||Stopping after the current distribution.}}')};
 $('#run').onclick=()=>lock(async()=>{
-  const r=roles();if(!r.y.length)throw Error('{{Y로 쓸 열을 하나 정해 주세요.||Please choose one column as Y.}}');
+  const r=roles();if(!r.y.length)throw Error('{{Y로 쓸 열을 하나 정해 주십시오.||Please choose one column as Y.}}');
   const cfg={...r,y:r.y[0],slope:r.re.length&&$('#slope').value?[+$('#slope').value]:[],inter:$('#inter').checked,links:$('#links').checked,zx:$('#zx').checked,zy:!!$('#zy').value,kind:$('#kind').value};
   $('#fin').hidden=$('#res').hidden=true;
   setupInfo=JSON.parse(await R(`setup(${q(JSON.stringify(cfg))})`));cands=setupInfo.cands;cur=[];first=true;stop=false;
@@ -632,7 +632,7 @@ $('#run').onclick=()=>lock(async()=>{
   try{for(let i=0;i<cands.length&&!stop;i++){st(`{{${i+1}/${cands.length} ${esc(cands[i].name)} 적합 중…||${i+1}/${cands.length} fitting ${esc(cands[i].name)}…}}`);
     try{cur.push(JSON.parse(await R(`fit_one(${i+1}L)`)))}catch(e){cur.push({i:i+1,name:cands[i].name,cmp:cands[i].cmp,ok:false,msg:err(e)})}
     $('#res').hidden=false;draw(i===cands.length-1)}}finally{$('#stop').hidden=true}
-  if(stop)draw(false,true);st(stop?`{{중단했어요. ${cands.length}개 중 ${cur.length}개만 비교했어요.||Stopped. Compared ${cur.length} of ${cands.length}.}}`:'{{비교가 끝났어요.||Comparison finished.}}');
+  if(stop)draw(false,true);st(stop?`{{중단했습니다. ${cands.length}개 중 ${cur.length}개만 비교했습니다.||Stopped. Compared ${cur.length} of ${cands.length}.}}`:'{{비교가 끝났습니다.||Comparison finished.}}');
 });
 const ranked=()=>{const c=cur.filter(m=>m.ok&&m.cmp&&m.aic!=null),b=Math.min(...c.map(m=>m.aic));cur.forEach(m=>m.d=c.includes(m)?m.aic-b:null);
   return [...cur].sort((a,b)=>(a.d??1e9)-(b.d??1e9)||(b.ok-a.ok))};
@@ -645,13 +645,13 @@ function draw(done,part){
   const L=ranked(),C=L.filter(m=>m.d!=null);
   $('#warn').innerHTML=setupInfo.warn.length?`<div class="box" style="margin-bottom:12px"><b>{{이 데이터에서 주의할 점||Cautions for this data}}</b><ul>${setupInfo.warn.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
   recoId=null;const P=C.filter(m=>m.diag&&m.diag.level<2&&!m.msg),pick=P.find(m=>m.diag.level===0&&m.d-(P[0]?.d??0)<=2)||P[0];
-  if(!done&&!part)$('#reco').innerHTML='<span class="mut">{{모든 후보가 끝나면 추천을 보여줄게요.||A suggestion appears when all candidates finish.}}</span>';
-  else if(!pick)$('#reco').innerHTML='<b>{{적합하다고 볼 만한 후보가 없어요.||No candidate fits adequately.}}</b><p>{{수렴이나 진단에 문제가 있어요. 빠진 변수, 반복측정 구조, 비선형, 이상치부터 확인해 보세요. AIC 1등을 그냥 고르지는 마세요.||There are convergence or diagnostic problems. Check for missing predictors, repeated-measures structure, nonlinearity and outliers first. Do not simply take the lowest AIC.}}</p>';
+  if(!done&&!part)$('#reco').innerHTML='<span class="mut">{{모든 후보가 끝나면 추천을 표시합니다.||A suggestion appears when all candidates finish.}}</span>';
+  else if(!pick)$('#reco').innerHTML='<b>{{적합하다고 볼 만한 후보가 없습니다.||No candidate fits adequately.}}</b><p>{{수렴이나 진단에 문제가 있습니다. 빠진 변수, 반복측정 구조, 비선형, 이상치부터 확인해 보십시오. AIC 1등을 그냥 고르지는 마십시오.||There are convergence or diagnostic problems. Check for missing predictors, repeated-measures structure, nonlinearity and outliers first. Do not simply take the lowest AIC.}}</p>';
   else{recoId=pick.i;const near=P.filter(m=>m!==pick&&Math.abs(m.d-pick.d)<=2);
-    $('#reco').innerHTML=`<b>{{먼저 검토할 후보: ${esc(pick.name)}||Consider first: ${esc(pick.name)}}}</b><p>{{진단에서 심각한 문제가 없는 후보 중 ${pick===P[0]?'AIC가 가장 낮아요':'AIC가 사실상 동률이고 진단이 더 깨끗해요'} (ΔAIC ${num(pick.d)}).${pick.diag.level?' 다만 주의 신호가 있으니 그래프를 확인하세요.':''}||Among candidates without serious diagnostic problems, ${pick===P[0]?'it has the lowest AIC':'it is practically tied on AIC and has cleaner diagnostics'} (ΔAIC ${num(pick.d)}).${pick.diag.level?' It still shows caution signs, so check the plots.':''}}}</p>`
-    +(pick.d>2&&pick!==C[0]?`<p class="wa">{{△ AIC는 ${esc(C[0].name)}이(가) 더 낮지만 진단이나 추정에 문제가 있어 뒤로 미뤘어요. 차이가 크면 모형 구조를 다시 보세요.||△ ${esc(C[0].name)} has a lower AIC but has diagnostic or estimation problems, so it was set aside. If the gap is large, rethink the model structure.}}</p>`:'')
-    +(near.length?`<p>{{${near.map(m=>esc(m.name)).join(', ')}도 거의 동률이에요. 이럴 땐 이론과 해석하기 쉬운 쪽으로 고르세요.||Nearly tied: ${near.map(m=>esc(m.name)).join(', ')}. Choose by theory and ease of interpretation.}}</p>`:'')+(part?'<p class="wa">{{△ 중간에 멈춰서 일부 후보만 비교한 결과예요.||△ Stopped early: only some candidates were compared.}}</p>':'')}
-  $('#rb').innerHTML=L.map(m=>`<tr class="${m.i===recoId?'rec':''}"><td><b>${esc(m.name)}</b>${m.note?`<br><span class="mut">${esc(m.note)}</span>`:''}</td><td class="n">${m.d!=null?num(m.d):m.ok?'{{비교 불가||n/a}}':''}</td>${['aic','aicc','bic'].map(k=>`<td class="n">${m.ok&&m.cmp?num(m[k]):''}</td>`).join('')}<td class="n">${m.df??''}</td><td>${diagText(m)}</td></tr>`).join('')+setupInfo.disabled.map(n=>`<tr class="mut"><td>${esc(n)}</td><td colspan="6">{{비활성: 표준화한 Y에는 쓸 수 없어요||Disabled: not available for standardized Y}}</td></tr>`).join('');
+    $('#reco').innerHTML=`<b>{{먼저 검토할 후보: ${esc(pick.name)}||Consider first: ${esc(pick.name)}}}</b><p>{{진단에서 심각한 문제가 없는 후보 중 ${pick===P[0]?'AIC가 가장 낮습니다':'AIC가 사실상 동률이고 진단이 더 깨끗합니다'} (ΔAIC ${num(pick.d)}).${pick.diag.level?' 다만 주의 신호가 있으니 그래프를 확인하십시오.':''}||Among candidates without serious diagnostic problems, ${pick===P[0]?'it has the lowest AIC':'it is practically tied on AIC and has cleaner diagnostics'} (ΔAIC ${num(pick.d)}).${pick.diag.level?' It still shows caution signs, so check the plots.':''}}}</p>`
+    +(pick.d>2&&pick!==C[0]?`<p class="wa">{{△ AIC는 ${esc(C[0].name)}이(가) 더 낮지만 진단이나 추정에 문제가 있어 뒤로 미뤘습니다. 차이가 크면 모형 구조를 다시 보십시오.||△ ${esc(C[0].name)} has a lower AIC but has diagnostic or estimation problems, so it was set aside. If the gap is large, rethink the model structure.}}</p>`:'')
+    +(near.length?`<p>{{${near.map(m=>esc(m.name)).join(', ')}도 거의 동률입니다. 이 경우에는 이론과 해석하기 쉬운 쪽으로 고르십시오.||Nearly tied: ${near.map(m=>esc(m.name)).join(', ')}. Choose by theory and ease of interpretation.}}</p>`:'')+(part?'<p class="wa">{{△ 중간에 멈춰서 일부 후보만 비교한 결과입니다.||△ Stopped early: only some candidates were compared.}}</p>':'')}
+  $('#rb').innerHTML=L.map(m=>`<tr class="${m.i===recoId?'rec':''}"><td><b>${esc(m.name)}</b>${m.note?`<br><span class="mut">${esc(m.note)}</span>`:''}</td><td class="n">${m.d!=null?num(m.d):m.ok?'{{비교 불가||n/a}}':''}</td>${['aic','aicc','bic'].map(k=>`<td class="n">${m.ok&&m.cmp?num(m[k]):''}</td>`).join('')}<td class="n">${m.df??''}</td><td>${diagText(m)}</td></tr>`).join('')+setupInfo.disabled.map(n=>`<tr class="mut"><td>${esc(n)}</td><td colspan="6">{{비활성: 표준화한 Y에는 쓸 수 없습니다||Disabled: not available for standardized Y}}</td></tr>`).join('');
   $('#qq').innerHTML=L.filter(m=>m.diag).map(m=>`<figure class="${m.i===recoId?'rec':''}">${qsvg(m.diag.pp.x.map((x,i)=>[x,m.diag.pp.y[i]]),m.diag.pp,m.name+' Q-Q')}<figcaption><b>${esc(m.name)}</b><br><span class="mut">${m.d!=null?'ΔAIC '+num(m.d):'{{참고용||reference only}}'}</span> <span class="${['ok','wa','er'][m.diag.level]}">${['{{✓ 큰 문제 없음||✓ No major problem}}','{{△ 주의||△ Caution}}','{{✕ 잘 안 맞음||✕ Poor fit}}'][m.diag.level]}</span></figcaption></figure>`).join('');
   $('#cards').innerHTML=L.filter(m=>m.diag).map(m=>`<div class="box card"><div class="row" style="justify-content:space-between"><h3>${esc(m.name)} <span class="mut">${m.d!=null?'ΔAIC '+num(m.d):'{{참고용||reference only}}'}</span></h3>${done||part?`<button data-fix="${m.i}" ${done||part?'':'disabled'}>{{이 분포로 확정||Choose this}}</button>`:''}</div><div class="ch"><figure>${pp(m.diag.pp)}<figcaption>{{잔차 분위수 (기대 vs 실제)||Residual Q-Q (expected vs observed)}}</figcaption></figure><figure>${rv(m.diag.rv)}<figcaption>{{예측값 순위 vs 잔차||Predicted rank vs residual}}</figcaption></figure><figure>${hi(m.diag.hist)}<figcaption>{{실제 Y vs 모델이 만든 Y||Observed Y vs model-generated Y}}${m.diag.hist.cut?'{{ (상위 1%는 끝 칸에 합침)|| (top 1% pooled in last bar)}}':''}</figcaption></figure></div></div>`).join('');
 }
@@ -681,18 +681,18 @@ $('#cards').onclick=e=>{const i=+e.target.dataset?.fix;if(!i)return;lock(async()
   const c=JSON.parse(await R(`coefs(${i}L)`)),code=await R(`code_for(${i}L,${q(file)},${q(sep)},${q(enc)})`),py=JSON.parse(await R(`py_for(${i}L,${q(file)},${q(sep)},${q(enc)})`)),m=cur.find(x=>x.i===i);
   const nm=s=>s.replace(/vv(\d+)__/g,(_,j)=>meta.cols[j-1].label),ex=['log','logit','cloglog'].includes(c.link)&&$('#kind').value!=='ordinal',ln=c.name.includes('Lognormal');
   const changed=!first;first=false;
-  $('#fb').innerHTML=`<h3>${esc(c.name)}</h3><p>${diagText(m)}</p>${changed?'<p class="er">{{✕ 계수를 본 뒤에 분포를 바꿨어요. 결과를 보고 고른 게 되지 않도록 바꾼 이유를 남기고 함께 보고하세요.||✕ You changed the distribution after seeing coefficients. Record and report why, so it is not a results-driven choice.}}</p>':''}
+  $('#fb').innerHTML=`<h3>${esc(c.name)}</h3><p>${diagText(m)}</p>${changed?'<p class="er">{{✕ 계수를 본 뒤에 분포를 바꿨습니다. 결과를 보고 고른 것이 되지 않도록 바꾼 이유를 남기고 함께 보고하십시오.||✕ You changed the distribution after seeing coefficients. Record and report why, so it is not a results-driven choice.}}</p>':''}
   <div class="tw"><table><thead><tr><th>{{항||Term}}</th><th class="n">{{추정치||Estimate}}</th><th class="n">{{표준오차||Std. error}}</th><th class="n">{{95% 구간||95% CI}}</th>${ex?'<th class="n">{{exp(추정치)||exp(estimate)}}</th>':''}<th class="n">p</th></tr></thead><tbody>${c.rows.map(r=>`<tr><td>${esc(nm(r.term))}${r.part==='zi'?' <span class="mut">{{(0 확률 부분)||(zero part)}}</span>':''}</td><td class="n">${num(r.est,3)}</td><td class="n">${num(r.se,3)}</td><td class="n">${num(r.lo,3)} ~ ${num(r.hi,3)}</td>${ex?`<td class="n">${num(Math.exp(r.est),3)}</td>`:''}<td class="n">${r.p==null?'':r.p<.001?'&lt; .001':num(r.p,3)}</td></tr>`).join('')}</tbody></table></div>
-  <p class="mut">{{Wald 검정이에요. 작은 표본에서는 부정확할 수 있어요. 범주 X는 알파벳순 첫 수준이 기준이에요.||Wald tests; can be inaccurate in small samples. For categorical X the alphabetically first level is the reference.}}${ln?'{{ 계수는 log(Y) 기준이라 평균이 아니라 기하평균에 대한 효과예요. Hurdle이면 0 확률은 별도의 상수예요.|| Coefficients are on log(Y), so they describe the geometric mean, not the mean. For Hurdle, the zero probability is a separate constant.}}':''}</p>
-  <p class="mut">{{논문에는 비교한 후보 전부(${cur.map(x=>esc(x.name)).join(', ')})와 AIC, 진단, 선택 이유를 함께 적으세요.||In your paper report all compared candidates (${cur.map(x=>esc(x.name)).join(', ')}) with AIC, diagnostics and the reason for your choice.}}</p>
+  <p class="mut">{{Wald 검정입니다. 작은 표본에서는 부정확할 수 있습니다. 범주 X는 알파벳순 첫 수준이 기준입니다.||Wald tests; can be inaccurate in small samples. For categorical X the alphabetically first level is the reference.}}${ln?'{{ 계수는 log(Y) 기준이라 평균이 아니라 기하평균에 대한 효과입니다. Hurdle이면 0 확률은 별도의 상수입니다.|| Coefficients are on log(Y), so they describe the geometric mean, not the mean. For Hurdle, the zero probability is a separate constant.}}':''}</p>
+  <p class="mut">{{논문에는 비교한 후보 전부(${cur.map(x=>esc(x.name)).join(', ')})와 AIC, 진단, 선택 이유를 함께 적으십시오.||In your paper report all compared candidates (${cur.map(x=>esc(x.name)).join(', ')}) with AIC, diagnostics and the reason for your choice.}}</p>
   <div class="row"><button id="dl">{{비교표 CSV 저장||Save comparison CSV}}</button>${demo?'<button id="dd">{{이 데이터 CSV 저장||Save this data as CSV}}</button>':''}</div>
-  <h3 style="margin-top:18px">{{바로 쓰는 코드||Ready-to-run code}}</h3><p class="mut">{{${esc(file)} 파일이 있는 폴더에서 실행하세요.||Run in the folder that contains ${esc(file)}.}}</p>
+  <h3 style="margin-top:18px">{{바로 쓰는 코드||Ready-to-run code}}</h3><p class="mut">{{${esc(file)} 파일이 있는 폴더에서 실행하십시오.||Run in the folder that contains ${esc(file)}.}}</p>
   <div class="row" style="margin-top:8px"><b>R</b><button data-cp="r">{{R 코드 복사||Copy R code}}</button></div><pre>${esc(code)}</pre>
-  <div class="row"><b>Python</b><button data-cp="py">{{Python 코드 복사||Copy Python code}}</button>${py.native?'<span class="mut">statsmodels</span>':'<span class="wa">{{△ statsmodels에 같은 모형이 없어 rpy2로 R을 불러요 (R 설치 필요)||△ No reliable statsmodels equivalent; calls R through rpy2 (R required)}}</span>'}</div><pre>${esc(py.code)}</pre>`;
-  document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=async()=>{const o=b.dataset.cp==='r'?'{{R 코드 복사||Copy R code}}':'{{Python 코드 복사||Copy Python code}}';try{await navigator.clipboard.writeText(loc(b.dataset.cp==='r'?code:py.code));b.textContent='{{복사했어요||Copied}}'}catch{getSelection().selectAllChildren(b.parentElement.nextElementSibling);b.textContent='{{선택했어요. Ctrl+C를 누르세요||Selected. Press Ctrl+C}}'}setTimeout(()=>b.textContent=o,2500)});
+  <div class="row"><b>Python</b><button data-cp="py">{{Python 코드 복사||Copy Python code}}</button>${py.native?'<span class="mut">statsmodels</span>':'<span class="wa">{{△ statsmodels에 같은 모형이 없어 rpy2로 R을 부릅니다 (R 설치 필요)||△ No reliable statsmodels equivalent; calls R through rpy2 (R required)}}</span>'}</div><pre>${esc(py.code)}</pre>`;
+  document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=async()=>{const o=b.dataset.cp==='r'?'{{R 코드 복사||Copy R code}}':'{{Python 코드 복사||Copy Python code}}';try{await navigator.clipboard.writeText(loc(b.dataset.cp==='r'?code:py.code));b.textContent='{{복사했습니다||Copied}}'}catch{getSelection().selectAllChildren(b.parentElement.nextElementSibling);b.textContent='{{선택했습니다. Ctrl+C를 누르십시오||Selected. Press Ctrl+C}}'}setTimeout(()=>b.textContent=o,2500)});
   const save=(t,n)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+loc(t)],{type:'text/csv'}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
   if(demo)$('#dd').onclick=()=>save(demo,file);
   $('#dl').onclick=()=>{const cell=v=>`"${String(v??'').replace(/"/g,'""')}"`,rows=[['{{분포||distribution}}','{{비교가능||comparable}}','{{수렴||converged}}','dAIC','AIC','AICc','BIC','{{모수||params}}','{{진단등급(0~2)||grade (0-2)}}','{{진단내용||issues}}','{{메시지||message}}','{{확정||chosen}}'],...ranked().map(x=>[x.name,x.cmp,x.ok,x.d,x.aic,x.aicc,x.bic,x.df,x.diag?.level,x.diag?.issues.join('; '),x.msg,x.i===i])];
     save(rows.map(r=>r.map(cell).join(',')).join('\n'),'glm_comparison.csv')};
-  $('#fin').hidden=false;$('#fin').scrollIntoView();st('{{분포를 확정했어요.||Distribution chosen.}}')})};
+  $('#fin').hidden=false;$('#fin').scrollIntoView();st('{{분포를 확정했습니다.||Distribution chosen.}}')})};
 </script></body></html>
