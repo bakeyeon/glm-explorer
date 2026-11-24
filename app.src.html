@@ -68,7 +68,7 @@ const loc=s=>String(s).replace(/\{\{([\s\S]*?)\|\|([\s\S]*?)\}\}/g,(_,k,e)=>LANG
 function tr(root){const g=n=>{if(/^(SCRIPT|STYLE)$/.test(n.parentNode?.nodeName))return;const raw=RAW.get(n)??n.data;if(!raw.includes('{{'))return;RAW.set(n,raw);const v=loc(raw);if(n.data!==v)n.data=v};
   if(root.nodeType===3)return g(root);const t=document.createTreeWalker(root,4);while(t.nextNode())g(t.currentNode);
   for(const el of [root,...(root.querySelectorAll?.('[aria-label]')||[])]){const raw=el.dataset?.al??el.getAttribute?.('aria-label');if(raw?.includes('{{')){el.dataset.al=raw;el.setAttribute('aria-label',loc(raw))}}}
-function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch{}document.documentElement.lang=l;document.title=l==='ko'?'{{GLM 분포 비교||GLM Distribution Explorer}} ':'GLM Distribution Explorer';document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));tr(document.body)}
+function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch{}document.documentElement.lang=l;document.title=l==='ko'?'GLM 분포 비교':'GLM Distribution Explorer';document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));tr(document.body)}
 setLang(LANG);document.documentElement.dataset.ready=1;
 new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1||n.nodeType===3)tr(n)}))).observe(document.body,{childList:true,subtree:true});
 document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
