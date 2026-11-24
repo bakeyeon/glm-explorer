@@ -25,6 +25,7 @@ html:not([data-ready]) main{visibility:hidden}[data-lang][aria-pressed=true]{bor
 </style></head><body><main>
 <div class="row" style="justify-content:space-between;align-items:flex-start"><h1>{{GLM 분포 비교||GLM Distribution Explorer}}</h1><div class="row" role="group" aria-label="Language" style="gap:4px"><button data-lang="en">English</button><button data-lang="ko">한국어</button></div></div>
 <p class="sub">{{데이터를 넣으면 가능한 분포를 한 번에 돌려 그래프와 함께 비교해요. 파일은 이 브라우저 안에서만 계산되고 서버로 보내지 않아요.||Load data to fit every plausible distribution at once and compare them visually. Your file is processed only in this browser and never uploaded.}}</p>
+<p class="box" style="border-left:3px solid var(--s1)"><b>{{분석 초기에 대충 한번 돌려보는 용도예요.||For a quick first look, not a final analysis.}}</b> {{어떤 분포가 그럴듯한지 대강 보고, 실제 분석은 데이터와 연구 설계에 맞게 코드를 다시 짜세요.||See which distributions look plausible, then write analysis code that fits your own data and design.}}</p>
 <div id="st" role="status"></div>
 <details class="box" open><summary>{{쓰기 전에 꼭 읽어 주세요||Please read before using}}</summary><ul>
 <li><b>{{분포는 먼저 연구 설계와 Y의 성질로 정하세요.||Start from your design and the nature of Y.}}</b>{{ 이 앱은 그 판단을 돕는 탐색 도구이고, 추천은 결론이 아니에요.|| This is an exploratory aid; its suggestion is not a conclusion.}}</li>
