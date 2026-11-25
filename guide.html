@@ -13,6 +13,7 @@ main{max-width:760px;margin:0 auto;padding:28px 16px 80px}h1{font-size:26px;line
 code{background:var(--sf);border:1px solid var(--grid);border-radius:4px;padding:0 4px;font-size:14px}
 html[lang=en] .ko,html[lang=ko] .en{display:none!important}
 svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color-scheme:dark){:root{--s2:#d95926}}
+.toc{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;margin:14px 0}h2{scroll-margin-top:12px}
 </style></head><body><main>
 <div class="top"><h1><span class="en">Beginner guide</span><span class="ko">초보자 안내</span></h1><div role="group" aria-label="Language"><button data-l="en">English</button> <button data-l="ko">한국어</button></div></div>
 <p><a href="https://bakeyeon.github.io/glm-explorer/">GLM Distribution Explorer</a></p>
@@ -20,6 +21,20 @@ svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color
 <section class="en">
 <p>For people who use R but are not sure which GLM distribution to try. You do not need to know the formulas.</p>
 <div class="box"><p><b>In short:</b> load a CSV, check the suggested roles, run, look at ΔAIC and the Q-Q plots, then copy the code of the model you want to work on.</p></div>
+
+<nav class="toc"></nav>
+<h2>If you already write glm() in R</h2>
+<p>What you may have learned in class, and where it is in the app:</p><div class="tw"><table><tr><th>In R</th><th>In the app</th><th>Meaning</th></tr>
+<tr><td><code>y ~ a + b</code></td><td>y as Y, a and b as X</td><td>each effect on its own</td></tr>
+<tr><td><code>y ~ a * b</code></td><td>tick "Include two-way interactions"</td><td>same as <code>a + b + a:b</code> (see 9)</td></tr>
+<tr><td><code>family = Gamma(link = "log")</code></td><td>choose the Y type; the candidates are run for you</td><td>distribution and link</td></tr>
+<tr><td><code>family = Gamma</code></td><td>tick "Also compare links"</td><td>no link given means inverse (see 8)</td></tr>
+<tr><td><code>(1 | id)</code></td><td>id as Random effect</td><td>each person has their own level</td></tr>
+<tr><td><code>(1 + a | id)</code></td><td>choose a under Random slope</td><td>the effect of a may differ by person too</td></tr>
+<tr><td><code>cbind(success, failure) ~ a</code></td><td>success as Y, failure as Failures</td><td>successes out of several tries</td></tr>
+<tr><td><code>offset(log(time))</code></td><td>time as Exposure</td><td>adjusts for observation time</td></tr>
+<tr><td><code>x = TRUE, y = TRUE</code></td><td>nothing to set</td><td>keeps the model matrix and Y inside the result for later use; coefficients do not change</td></tr></table></div>
+<p class="mut"><code>(1 | id)</code> is for mixed models such as <code>glmer()</code> or <code>glmmTMB()</code>; plain <code>glm()</code> has no random effects. With three X, <code>a * b * c</code> in R also adds the three-way interaction, while the app stops at two-way, like <code>(a + b + c)^2</code>.</p>
 
 <h2>1. Check the shape of your data</h2>
 <p>The app expects one row per observation. If each person answered several items, each answer is its own row (long format):</p>
@@ -100,6 +115,20 @@ svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color
 <section class="ko">
 <p>R은 사용하지만 GLM에서 어떤 분포를 써볼지 막막한 분들을 위한 안내입니다. 수식을 몰라도 보실 수 있습니다.</p>
 <div class="box"><p><b>한눈에 보기:</b> CSV를 올리고, 추천된 역할을 확인하고, 실행한 뒤 ΔAIC와 Q-Q 플롯을 봅니다. 그다음 작업할 모델의 코드를 복사하시면 됩니다.</p></div>
+
+<nav class="toc"></nav>
+<h2>R에서 glm()을 써 보셨다면</h2>
+<p>수업에서 배우신 코드가 앱의 어디에 해당하는지 정리했습니다.</p><div class="tw"><table><tr><th>R 코드</th><th>앱에서는</th><th>뜻</th></tr>
+<tr><td><code>y ~ a + b</code></td><td>y는 Y, a와 b는 X</td><td>각각의 효과</td></tr>
+<tr><td><code>y ~ a * b</code></td><td>"X끼리 2원 교호작용 포함" 체크</td><td><code>a + b + a:b</code>와 같음 (9번 참고)</td></tr>
+<tr><td><code>family = Gamma(link = "log")</code></td><td>Y 유형을 고르면 후보로 함께 실행</td><td>분포와 링크</td></tr>
+<tr><td><code>family = Gamma</code></td><td>"링크 함수도 비교" 체크</td><td>링크를 적지 않으면 inverse (8번 참고)</td></tr>
+<tr><td><code>(1 | id)</code></td><td>id를 랜덤효과로</td><td>사람마다 다른 기본 수준</td></tr>
+<tr><td><code>(1 + a | id)</code></td><td>랜덤 기울기에서 a 선택</td><td>a의 효과도 사람마다 다를 수 있음</td></tr>
+<tr><td><code>cbind(success, failure) ~ a</code></td><td>성공은 Y, 실패는 실패 수</td><td>여러 번 시도한 성공 횟수</td></tr>
+<tr><td><code>offset(log(time))</code></td><td>time을 노출량으로</td><td>관찰 시간 보정</td></tr>
+<tr><td><code>x = TRUE, y = TRUE</code></td><td>설정하지 않아도 됨</td><td>모형 행렬과 Y를 결과에 함께 저장하는 옵션. 계수는 달라지지 않음</td></tr></table></div>
+<p class="mut"><code>(1 | id)</code>는 <code>glmer()</code>나 <code>glmmTMB()</code> 같은 혼합모형에서 쓰며, 기본 <code>glm()</code>에는 랜덤효과가 없습니다. X가 3개이면 R의 <code>a * b * c</code>는 3원 교호작용까지 넣고, 앱은 <code>(a + b + c)^2</code>처럼 2원까지 넣습니다.</p>
 
 <h2>1. 데이터 모양 확인</h2>
 <p>한 행에 관측 하나를 기준으로 합니다. 한 사람이 여러 번 답했다면 답 하나가 한 행이 됩니다(long 형식).</p>
@@ -189,6 +218,7 @@ const line=(el,al,ys,yt,xt,c)=>{const y=v=>150-(v-yt[0])/(yt.at(-1)-yt[0])*115,x
 document.querySelectorAll('.it').forEach(el=>line(el,'novice 10 to 14, expert 8 to 9',0,[6,8,10,12,14],['tool A','tool B'],[['novice',[10,14],'var(--s2)'],['expert',[8,9],'var(--s1)']]));
 const T=Array.from({length:21},(_,i)=>i/10);
 document.querySelectorAll('.lk').forEach(el=>line(el,'predicted mean by difficulty: log 500, 625, 781; inverse 500, 625, 833',0,[400,600,800],['0','1','2'],[['inverse',T.map(t=>1000/(2-.4*t)),'var(--s2)'],['log',T.map(t=>500*1.25**t),'var(--s1)']]));
+document.querySelectorAll('section').forEach(sc=>{const l=sc.className,hs=[...sc.querySelectorAll('h2')];hs.forEach((h,i)=>h.id=l+i);const n=sc.querySelector('.toc');n.setAttribute('aria-label',l==='ko'?'목차':'Contents');n.innerHTML=hs.map(h=>`<a href="#${h.id}">${h.textContent}</a>`).join('')});
 let L=new URLSearchParams(location.search).get('lang');try{L=L||localStorage.getItem('lang')}catch{}
 function set(l){document.documentElement.lang=l;document.title=l==='ko'?'초보자 안내 · GLM 분포 비교':'Beginner guide · GLM Distribution Explorer';document.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===l))}
 set(L==='ko'?'ko':'en');document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{set(b.dataset.l);try{localStorage.setItem('lang',b.dataset.l)}catch{}});
