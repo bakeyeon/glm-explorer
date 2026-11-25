@@ -86,6 +86,7 @@ pre.one{background:var(--sf);border:1px solid var(--grid);border-radius:8px;padd
 <tr><td>For successes out of several tries: the success column</td><td><b>Y</b>, plus the failure column as <b>Failures</b> or the total as <b>Trials</b></td></tr>
 <tr><td>Row numbers, memos, dates, other outcomes</td><td><b>Not used</b></td></tr></table></div>
 <div class="box"><p><b>The one to look at twice:</b> if the same person answered more than once and the ID is not a random effect, p-values tend to come out too small.</p></div>
+<div class="box"><p><b>Copying rows to balance groups:</b> resampling 35 people up to 112 leaves the mean about the same but makes p-values too small, because the same people are counted several times. Unequal group sizes are usually fine as they are. To match a population (for example by gender or age), weights, such as in the R package <code>survey</code>, or adding those variables as X are common options.</p></div>
 
 <h2>3. Check the type of Y</h2>
 <div class="tw"><table><tr><th>What Y looks like</th><th>Type</th><th>Distributions compared</th></tr>
@@ -216,6 +217,7 @@ pre.one{background:var(--sf);border:1px solid var(--grid);border-radius:8px;padd
 <tr><td>여러 번 시도한 성공 횟수</td><td>성공 열을 <b>Y</b>로, 실패 열은 <b>실패 수</b> 또는 전체 열은 <b>시행 수</b>로</td></tr>
 <tr><td>행 번호, 메모, 날짜, 다른 결과 변수</td><td><b>사용 안 함</b></td></tr></table></div>
 <div class="box"><p><b>한 번 더 볼 부분:</b> 같은 사람이 여러 번 답했는데 ID가 랜덤효과에 없으면 p값이 실제보다 작게 나오기 쉽습니다.</p></div>
+<div class="box"><p><b>집단 크기를 맞추려고 행을 복제할 때:</b> 35명을 다시 뽑아 112명으로 늘리면 평균은 거의 그대로인데, 같은 사람을 여러 번 세게 되어 p값이 실제보다 작게 나옵니다. 집단의 인원이 서로 달라도 대체로 그대로 분석하실 수 있습니다. 성별이나 연령을 모집단에 맞추려면 R의 <code>survey</code> 패키지 같은 가중치나, 그 변수를 X로 넣는 방법이 흔히 쓰입니다.</p></div>
 
 <h2>3. Y 유형 확인</h2>
 <div class="tw"><table><tr><th>Y의 모습</th><th>유형</th><th>비교하는 분포</th></tr>
