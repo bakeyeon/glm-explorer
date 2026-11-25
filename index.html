@@ -29,8 +29,9 @@ a{color:var(--link)}
 <p class="sub">{{데이터를 넣으면 가능한 분포를 한 번에 돌려 그래프와 함께 비교합니다. 파일은 이 브라우저 안에서만 계산되고 서버로 보내지 않습니다.||Load data to fit every plausible distribution at once and compare them visually. Your file is processed only in this browser and never uploaded.}}</p>
 <p class="box" style="border-left:3px solid var(--s1)"><b>{{분석 초기에 간단히 돌려보는 용도입니다.||For a quick first look, not a final analysis.}}</b> {{어떤 분포가 그럴듯한지 대략 확인하고, 실제 분석은 데이터와 연구 설계에 맞게 코드를 다시 작성하시기를 권합니다.||See which distributions look plausible, then write analysis code that fits your own data and design.}}</p>
 <p class="mut">{{내려받아 로컬에서 사용하실 수도 있습니다. 저장소에서 index.html을 받아 브라우저로 여시면 됩니다. R을 불러올 때는 인터넷 연결이 필요합니다.||You can also run it locally: download index.html from the repository and open it in a browser. An internet connection is needed to load R.}} <a href="https://github.com/bakeyeon/glm-explorer" target="_blank" rel="noopener">github.com/bakeyeon/glm-explorer</a></p>
+<p><a id="gd" href="https://bakeyeon.github.io/glm-explorer/guide.html" target="_blank" rel="noopener">{{처음 사용하시는 분을 위한 초보자 안내||New to GLMs? Open the beginner guide}} ↗</a></p>
 <div id="st" role="status"></div>
-<details class="box" open><summary>{{사용 전에 읽어 주십시오||Please read before using}}</summary><ul>
+<details class="box"><summary>{{사용 전에 읽어 주십시오||Please read before using}}</summary><ul>
 <li><b>{{연구 설계와 Y의 성질을 아는 분의 판단을 돕는 도구입니다.||Meant to support your own knowledge of the design and Y.}}</b>{{ 추천은 탐색용 참고 자료입니다.|| Suggestions are exploratory pointers.}}</li>
 <li><b>{{Y 자체의 히스토그램만으로는 분포를 판단하기 어렵습니다.||A histogram of Y alone says little about the distribution.}}</b>{{ GLM은 X가 주어졌을 때의 Y를 가정하므로 이 앱은 잔차와 시뮬레이션을 보여줍니다.|| GLMs make assumptions about Y given X, so this app shows residuals and simulations.}}</li>
 <li><b>{{AIC는 후보들 사이의 상대 순위입니다.||AIC only ranks the candidates relative to each other.}}</b>{{ 1등도 데이터에 맞지 않을 수 있어 진단을 함께 표시합니다. ΔAIC가 2 이하면 사실상 구분하기 어렵습니다.|| Even the top one can fit badly, so diagnostics are shown alongside. ΔAIC of 2 or less is practically a tie.}}</li>
@@ -533,7 +534,7 @@ const loc=s=>String(s).replace(/\{\{([\s\S]*?)\|\|([\s\S]*?)\}\}/g,(_,k,e)=>LANG
 function tr(root){const g=n=>{if(/^(SCRIPT|STYLE)$/.test(n.parentNode?.nodeName))return;const raw=RAW.get(n)??n.data;if(!raw.includes('{{'))return;RAW.set(n,raw);const v=loc(raw);if(n.data!==v)n.data=v};
   if(root.nodeType===3)return g(root);const t=document.createTreeWalker(root,4);while(t.nextNode())g(t.currentNode);
   for(const el of [root,...(root.querySelectorAll?.('[aria-label]')||[])]){const raw=el.dataset?.al??el.getAttribute?.('aria-label');if(raw?.includes('{{')){el.dataset.al=raw;el.setAttribute('aria-label',loc(raw))}}}
-function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch{}document.documentElement.lang=l;document.title=l==='ko'?'GLM 분포 비교':'GLM Distribution Explorer';document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));tr(document.body)}
+function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch{}document.documentElement.lang=l;document.getElementById('gd').href='https://bakeyeon.github.io/glm-explorer/guide.html?lang='+l;document.title=l==='ko'?'GLM 분포 비교':'GLM Distribution Explorer';document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));tr(document.body)}
 setLang(LANG);document.documentElement.dataset.ready=1;
 new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1||n.nodeType===3)tr(n)}))).observe(document.body,{childList:true,subtree:true});
 document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
