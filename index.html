@@ -200,6 +200,11 @@ setup <- function(cfgjson) {
   for (k in c(fac, re)) d[[k]] <- droplevels(factor(d[[k]]))
   for (k in c(fac, re)) if (nlevels(d[[k]]) < 2) stop(bf("{{'%s'의 수준이 하나뿐입니다.||'%s' has only one level.}}", lab(k)))
   for (k in num) if (length(unique(d[[k]])) < 2) stop(bf("{{'%s' 값이 모두 같습니다.||All values of '%s' are identical.}}", lab(k)))
+  S$lx <- if (length(cfg$lx)) v(cfg$lx) else character()
+  for (k in S$lx) {
+    if (any(d[[k]] <= 0)) stop(bf("{{'%s'에 0 이하인 값이 있어 로그를 쓰기 어렵습니다. X 수치로 바꾸거나 1을 더한 열을 만들어 주십시오.||'%s' has values of 0 or below, so its log is not defined. Use X numeric, or add a column with 1 added.}}", lab(k)))
+    d[[k]] <- log(d[[k]])
+  }
   S$zx <- if (isTRUE(cfg$zx)) num else character(); S$zy <- isTRUE(cfg$zy)
   for (k in S$zx) d[[k]] <- as.numeric(scale(d[[k]]))
   if (S$zy) {
@@ -236,6 +241,12 @@ setup <- function(cfgjson) {
   if (length(re) && kind == "pos" && !S$zy) warn <- c(warn, "{{Inverse Gaussian은 랜덤효과가 있으면 같은 기준의 우도를 얻기 어려워 뺐습니다.||Inverse Gaussian was left out: with random effects a likelihood on the same footing is hard to obtain.}}")
   if (!length(re)) warn <- c(warn, "{{랜덤효과가 없습니다. 한 사람/집단에서 여러 번 측정했다면 ID를 랜덤효과로 넣는 것을 권합니다.||No random effect. If the same person or group was measured repeatedly, add its ID as a random effect.}}")
   if (kind == "binary") warn <- c(warn, "{{0/1 자료의 분포는 이항분포로 정해져 있습니다. 여기서 비교하는 것은 링크 함수이고, 분포 진단으로는 문제가 잘 드러나지 않을 수 있습니다.||0/1 data are always binomial. What is compared here is the link function, and distribution diagnostics detect little.}}")
+  if (length(S$lx)) warn <- c(warn, if (length(intersect(S$lx, S$zx))) "{{로그로 바꾼 X는 로그를 취한 뒤 표준화했습니다.||Log-transformed X were logged first, then standardized.}}" else "{{로그(자연로그)로 바꾼 X의 계수는 X가 약 2.72배가 될 때의 변화입니다.||For X in natural logs, a coefficient is the change when X is multiplied by about 2.72.}}")
+  if (kind %in% c("binary", "trials", "count")) for (k in fac) {
+    tot1 <- if (kind == "trials") tot else if (kind == "binary") rep(1, n) else rep(Inf, n)
+    one <- names(which(tapply(seq_len(n), d[[k]], function(i) all(y[i] == 0) || all(y[i] == tot1[i]))))
+    if (length(one)) warn <- c(warn, bf("{{'%s'의 %s에서는 Y가 한쪽 값뿐입니다. 분리(separation)로 계수와 표준오차가 매우 커질 수 있습니다. 수준을 합치거나 표를 확인해 보시기를 권합니다.||In '%s', level(s) %s have only one kind of Y. Separation may make the coefficient and standard error blow up. Consider merging levels or checking the table.}}", lab(k), paste(one, collapse = ", ")))
+  }
   if (kind == "ordinal") {
     gap <- setdiff(seq(min(y), max(y)), y)
     if (int && length(gap)) warn <- c(warn, bf("{{중간 단계 %s은(는) 응답이 없어서, 나온 단계끼리 이어서 계산합니다.||Level(s) %s were never chosen; the observed levels are treated as adjacent.}}", paste(gap, collapse = ", ")))
@@ -376,6 +387,14 @@ fit_one <- function(i) {
     if (inherits(m, "clmm")) { if (any(!is.finite(suppressWarnings(sqrt(diag(vcov(m))))))) { ok <- FALSE; msg <- c(msg, "{{표준오차 계산 실패 (추정 불안정)||standard errors could not be computed (unstable)}}") } }
     else if (m$convergence$code > 0) { ok <- FALSE; msg <- c(msg, "{{수렴하지 않음||did not converge}}") }
   }
+  if (S$kind %in% c("binary", "trials", "count") && k$engine == "tmb") {
+    cc <- tryCatch(summary(m)$coefficients$cond, error = function(e) NULL)
+    if (!is.null(cc)) {
+      X <- model.matrix(as.formula(paste("~", S$rhs)), S$d); mx <- apply(abs(X), 2, max)[rownames(cc)]
+      if (any(!is.finite(cc[, 2])) || any(cc[, 2] * mx > 20, na.rm = TRUE) || any(abs(cc[, 1]) * mx > 15 & cc[, 2] * mx > 5, na.rm = TRUE))
+        msg <- c(msg, "{{분리(separation) 가능성: 계수나 표준오차가 매우 큼||possible separation: very large coefficient or standard error}}")
+    }
+  }
   l0 <- logLik(m); df <- attr(l0, "df"); n <- nrow(S$d); ll <- as.numeric(l0)
   if (k$engine == "ln") {
     ll <- ll - sum(log(S$y[S$y > 0]))
@@ -417,6 +436,7 @@ code_for <- function(i, file, sep = ",", enc = "UTF-8") {
     sprintf("used <- c(%s)", paste(encodeString(lab(used), quote = "\""), collapse = ", ")),
     "d <- d[complete.cases(d[used]), ]")
   if (length(fac)) o <- c(o, sprintf("d$%1$s <- factor(d$%1$s)", sapply(fac, q)))
+  for (z in S$lx) o <- c(o, sprintf("d$%1$s <- log(d$%1$s)", q(z)))
   for (z in c(S$zx, if (S$zy) S$yv)) o <- c(o, sprintf("d$%1$s <- as.numeric(scale(d$%1$s))", q(z)))
   if (S$kind == "binary") o <- c(o, sprintf("d$%1$s <- as.integer(d$%1$s == sort(unique(d$%1$s))[2])", q(S$yv)))
   if (k$engine == "tmb") o <- c(o, sprintf("m <- glmmTMB(%s, data = d,\n             family = %s, ziformula = %s)", bt(S$f), k$fam, paste0(k$zi, if (k$link %in% c("identity", "inverse") && grepl("Gamma", k$fam))
@@ -523,6 +543,7 @@ py_for <- function(i, file, sep = ",", enc = "UTF-8") {
     sprintf("used = %s", Q(I(lab(used)))), "d = d.dropna(subset=used).copy()", sprintf("ycol = %s", Q(lab(S$yv))))
   for (f in setdiff(fac, S$re)) { lv <- levels(S$d[[f]])
     o <- c(o, sprintf("%1$s = pd.Categorical(%1$s, categories=%2$s)", col(f), if (is.numeric(S$raw[[f]])) paste0("[", paste(lv, collapse = ", "), "]") else Q(I(lv)))) }
+  for (z in S$lx) o <- c(o, sprintf("%1$s = np.log(%1$s)", col(z)))
   for (z in c(S$zx, if (S$zy) S$yv)) o <- c(o, sprintf("%1$s = (%1$s - %1$s.mean()) / %1$s.std(){{  # 표준화||  # standardize}}", col(z)))
   if (S$kind == "binary") o <- c(o, sprintf("%1$s = (%1$s == %2$s).astype(int)", yv, Q(S$succ)))
   o <- c(o, "", body, "print(m.summary())")
@@ -556,13 +577,13 @@ function boot(){return ready??=(async()=>{
 const start=boot();start.catch(e=>st('<span class="er">{{R을 불러오는 데 문제가 있었습니다. 인터넷 연결을 확인하고 새로고침해 주십시오.||Could not load R. Check your connection and refresh.}} '+esc(err(e))+'</span>'));
 async function lock(f){if(busy)return;busy=true;document.querySelectorAll('button:not(#stop),#file').forEach(b=>b.dataset.lang||(b.disabled=true));
   try{await start;await f()}catch(e){st('<span class="er">'+esc(err(e))+'</span>')}finally{busy=false;document.querySelectorAll('button,#file').forEach(b=>b.disabled=false)}}
-let longN=0;
+let longN=0,runLx=[];
 async function load(text,name,en='UTF-8',np=0){longN=np;
   file=name;enc=en;demo='';const l=text.split(/\r?\n/)[0];sep=[',','\t',';'].sort((a,b)=>l.split(b).length-l.split(a).length)[0];
   await w.FS.writeFile('/tmp/d.csv',new TextEncoder().encode(text.replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n')));
   meta=JSON.parse(await R(`load_csv("/tmp/d.csv",${q(sep)})`));
   $('#dinfo').textContent=`{{${name}: ${meta.n}행, ${meta.cols.length}열||${name}: ${meta.n} rows, ${meta.cols.length} columns}}`;
-  $('#vb').innerHTML=meta.cols.map((c,i)=>`<tr><td>${esc(c.label)}</td><td class="mut">${esc(c.range)}</td><td class="n">${c.uniq}</td><td class="n">${c.missing}</td><td><select data-i="${i+1}" aria-label="{{${esc(c.label)} 역할||Role of ${esc(c.label)}}}"><option value="">{{사용 안 함||Not used}}</option><option value="y">{{Y (결과)||Y (outcome)}}</option>${c.numeric?'<option value="num">{{X 수치||X numeric}}</option>':''}<option value="fac">{{X 범주||X categorical}}</option><option value="re">{{랜덤효과 (ID, 집단)||Random effect (ID, group)}}</option>${c.numeric?'<option value="off">{{노출량 (offset)||Exposure (offset)}}</option><option value="tri">{{시행 수 (전체)||Trials (total)}}</option><option value="fai">{{실패 수||Failures}}</option>':''}</select></td><td class="mut" data-w="${i+1}"></td></tr>`).join('');
+  $('#vb').innerHTML=meta.cols.map((c,i)=>`<tr><td>${esc(c.label)}</td><td class="mut">${esc(c.range)}</td><td class="n">${c.uniq}</td><td class="n">${c.missing}</td><td><select data-i="${i+1}" aria-label="{{${esc(c.label)} 역할||Role of ${esc(c.label)}}}"><option value="">{{사용 안 함||Not used}}</option><option value="y">{{Y (결과)||Y (outcome)}}</option>${c.numeric?'<option value="num">{{X 수치||X numeric}}</option><option value="lx">{{X 수치 (log)||X numeric (log)}}</option>':''}<option value="fac">{{X 범주||X categorical}}</option><option value="re">{{랜덤효과 (ID, 집단)||Random effect (ID, group)}}</option>${c.numeric?'<option value="off">{{노출량 (offset)||Exposure (offset)}}</option><option value="tri">{{시행 수 (전체)||Trials (total)}}</option><option value="fai">{{실패 수||Failures}}</option>':''}</select></td><td class="mut" data-w="${i+1}"></td></tr>`).join('');
   $('#vars').hidden=false;$('#res').hidden=$('#fin').hidden=true;fill();if(np){$('#wide').hidden=true}else askWide();st('{{데이터를 불러왔습니다. 추천 역할을 확인해 주십시오.||Data loaded. Check the suggested roles.}}');
 }
 // 역할 추천: 이름(단어 단위)과 값의 모양만 본다
@@ -612,14 +633,14 @@ function suggest(){
     if(st[i]==='out'){out[i]=['','{{다른 결과 변수로 보여 제외||looks like another outcome}}'];continue}
     if(c.missing>n*.2){out[i]=['','{{결측이 많아 제외 (넣으면 그 행이 빠짐)||many missing values: including it drops those rows}}'];continue}
     if(k>=max){out[i]=['','{{X가 많아 일단 제외||left out: many X already}}'];continue}
-    k++;out[i]=!c.numeric||c.uniq===2?['fac','{{종류가 적은 값||few distinct values}}']:has(c,/^(condition|cond|group|treatment|gender|sex|조건|집단|그룹|성별)$/)&&c.uniq<=10?['fac','{{조건/집단 이름의 숫자 코드||numeric codes for a condition or group}}']:['num','{{숫자 값||numeric values}}']}
+    k++;out[i]=!c.numeric||c.uniq===2?['fac','{{종류가 적은 값||few distinct values}}']:has(c,/^(condition|cond|group|treatment|gender|sex|조건|집단|그룹|성별)$/)&&c.uniq<=10?['fac','{{조건/집단 이름의 숫자 코드||numeric codes for a condition or group}}']:has(c,/^(freq|freqs|frequency|빈도|빈도수)$|freq(uency)?$/)&&c.min>0&&c.max/c.min>=50?['lx','{{빈도이고 범위가 넓어 로그 추천||frequency with a wide range: log suggested}}']:['num','{{숫자 값||numeric values}}']}
   return{out,tri:out.some(o=>o[0]==='tri'||o[0]==='fai')}
 }
 function fill(){const{out,tri}=suggest();if(!longN&&wideCols().length&&!out.some(o=>o[0]==='y'&&o[1].includes('흔한')))out.forEach(o=>{o[0]='';o[1]='{{wide 형식 같음: 변환하거나 직접 선택||looks wide: convert or choose yourself}}'});$('#kh').textContent='';document.querySelectorAll('#vb select').forEach(s=>{const o=out[s.dataset.i-1];s.value=o[0];$(`[data-w="${s.dataset.i}"]`).textContent=o[1]});
   const y=[...document.querySelectorAll('#vb select')].find(s=>s.value==='y');if(y)setKind(y);if(tri)$('#kind').value='trials';upd()}
 function setKind(s){const k=meta.cols[s.dataset.i-1].kind;if(k!=='none'){$('#kind').value=k;$('#kh').textContent='{{Y 값을 보고 유형을 골라 뒀습니다. 맞는지 확인해 주십시오.||The type was guessed from Y. Please check that it is right.}}'}}
 $('#sug').onclick=fill;$('#clr').onclick=()=>{document.querySelectorAll('#vb select').forEach(s=>{s.value='';$(`[data-w="${s.dataset.i}"]`).textContent=''});upd()};
-const roles=()=>{const o={y:[],num:[],fac:[],re:[],off:[],tri:[],fai:[]};document.querySelectorAll('#vb select').forEach(s=>s.value&&o[s.value].push(+s.dataset.i));return o};
+const roles=()=>{const o={y:[],num:[],lx:[],fac:[],re:[],off:[],tri:[],fai:[]};document.querySelectorAll('#vb select').forEach(s=>s.value&&o[s.value].push(+s.dataset.i));o.num=[...o.num,...o.lx];return o};
 function upd(){const r=roles();const sl=$('#slope'),v=sl.value;sl.innerHTML='<option value="">{{없음 (절편만)||None (intercept only)}}</option>'+[...r.num,...r.fac].map(i=>`<option value="${i}">${esc(meta.cols[i-1].label)}</option>`).join('');sl.value=[...r.num,...r.fac].includes(+v)?v:'';$('#slw').hidden=!r.re.length;
   {const t=$('#kind').value==='trials',n=c=>esc(meta.cols[c-1].label);$('#bh').hidden=!t;if(t){const b=r.tri[0]||r.fai[0];
     $('#bh').innerHTML='<b>{{성공 수/시행 수 설정||Setting up successes / trials}}</b><ul><li>{{성공 열과 실패 열이 있을 때: 성공 → Y, 실패 → 실패 수||Success and failure columns: successes → Y, failures → Failures}}</li><li>{{성공 열과 전체 열이 있을 때: 성공 → Y, 전체 → 시행 수 (전체)||Success and total columns: successes → Y, total → Trials (total)}}</li><li>{{한 행이 시행 하나(0/1)일 때: Y 유형을 이분형으로||One row per trial (0/1): use the Binary type}}</li></ul>'
@@ -636,7 +657,7 @@ document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=()=>lock(async()=>
 $('#stop').onclick=()=>{stop=true;st('{{지금 돌리는 분포까지만 끝내고 멈추겠습니다.||Stopping after the current distribution.}}')};
 $('#run').onclick=()=>lock(async()=>{
   const r=roles();if(!r.y.length)throw Error('{{Y로 쓸 열을 하나 정해 주십시오.||Please choose one column as Y.}}');
-  const cfg={...r,y:r.y[0],slope:r.re.length&&$('#slope').value?[+$('#slope').value]:[],inter:$('#inter').checked,links:$('#links').checked,zx:$('#zx').checked,zy:!!$('#zy').value,kind:$('#kind').value};
+  runLx=r.lx;const cfg={...r,y:r.y[0],slope:r.re.length&&$('#slope').value?[+$('#slope').value]:[],inter:$('#inter').checked,links:$('#links').checked,zx:$('#zx').checked,zy:!!$('#zy').value,kind:$('#kind').value};
   $('#fin').hidden=$('#res').hidden=true;
   setupInfo=JSON.parse(await R(`setup(${q(JSON.stringify(cfg))})`));cands=setupInfo.cands;cur=[];first=true;stop=false;
   $('#stop').hidden=false;$('#stop').disabled=false;
@@ -690,7 +711,7 @@ function hi(d){const n=d.obs.length,mx=Math.max(...d.obs,...d.hi)*1.05,bw=(W-l-8
   disc?d.obs.map((_,i)=>[(i+.5)/n,f(d.br[i]+.5)]).filter((_,i)=>n<=12||i%5===0):[[0,f(a)],[.5,f((a+z)/2)],[.96,f(z)]],[[0,'0'],[.5,num(mx*50,0)+'%'],[1,num(mx*100,0)+'%']])}
 $('#cards').onclick=e=>{const i=+e.target.dataset?.fix;if(!i)return;lock(async()=>{
   const c=JSON.parse(await R(`coefs(${i}L)`)),code=await R(`code_for(${i}L,${q(file)},${q(sep)},${q(enc)})`),py=JSON.parse(await R(`py_for(${i}L,${q(file)},${q(sep)},${q(enc)})`)),m=cur.find(x=>x.i===i);
-  const nm=s=>s.replace(/vv(\d+)__/g,(_,j)=>meta.cols[j-1].label),ex=['log','logit','cloglog'].includes(c.link)&&$('#kind').value!=='ordinal',ln=c.name.includes('Lognormal');
+  const nm=s=>s.replace(/vv(\d+)__/g,(_,j)=>runLx.includes(+j)?`log(${meta.cols[j-1].label})`:meta.cols[j-1].label),ex=['log','logit','cloglog'].includes(c.link)&&$('#kind').value!=='ordinal',ln=c.name.includes('Lognormal');
   const changed=!first;first=false;
   $('#fb').innerHTML=`<h3>${esc(c.name)}</h3><p>${diagText(m)}</p>${changed?'<p class="wa">{{△ 계수를 본 뒤에 분포를 바꿨습니다. 결과를 보고 고른 것으로 비칠 수 있으니, 바꾼 이유를 함께 보고하시기를 권합니다.||△ You changed the distribution after seeing coefficients. Record and report why, so it is not a results-driven choice.}}</p>':''}
   <div class="tw"><table><thead><tr><th>{{항||Term}}</th><th class="n">{{추정치||Estimate}}</th><th class="n">{{표준오차||Std. error}}</th><th class="n">{{95% 구간||95% CI}}</th>${ex?'<th class="n">{{exp(추정치)||exp(estimate)}}</th>':''}<th class="n">p</th></tr></thead><tbody>${c.rows.map(r=>`<tr><td>${esc(nm(r.term))}${r.part==='zi'?' <span class="mut">{{(0 확률 부분)||(zero part)}}</span>':''}</td><td class="n">${num(r.est,3)}</td><td class="n">${num(r.se,3)}</td><td class="n">${num(r.lo,3)} ~ ${num(r.hi,3)}</td>${ex?`<td class="n">${num(Math.exp(r.est),3)}</td>`:''}<td class="n">${r.p==null?'':r.p<.001?'&lt; .001':num(r.p,3)}</td></tr>`).join('')}</tbody></table></div>

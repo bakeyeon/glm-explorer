@@ -135,6 +135,11 @@ setup <- function(cfgjson) {
   for (k in c(fac, re)) d[[k]] <- droplevels(factor(d[[k]]))
   for (k in c(fac, re)) if (nlevels(d[[k]]) < 2) stop(bf("{{'%s'의 수준이 하나뿐입니다.||'%s' has only one level.}}", lab(k)))
   for (k in num) if (length(unique(d[[k]])) < 2) stop(bf("{{'%s' 값이 모두 같습니다.||All values of '%s' are identical.}}", lab(k)))
+  S$lx <- if (length(cfg$lx)) v(cfg$lx) else character()
+  for (k in S$lx) {
+    if (any(d[[k]] <= 0)) stop(bf("{{'%s'에 0 이하인 값이 있어 로그를 쓰기 어렵습니다. X 수치로 바꾸거나 1을 더한 열을 만들어 주십시오.||'%s' has values of 0 or below, so its log is not defined. Use X numeric, or add a column with 1 added.}}", lab(k)))
+    d[[k]] <- log(d[[k]])
+  }
   S$zx <- if (isTRUE(cfg$zx)) num else character(); S$zy <- isTRUE(cfg$zy)
   for (k in S$zx) d[[k]] <- as.numeric(scale(d[[k]]))
   if (S$zy) {
@@ -171,6 +176,12 @@ setup <- function(cfgjson) {
   if (length(re) && kind == "pos" && !S$zy) warn <- c(warn, "{{Inverse Gaussian은 랜덤효과가 있으면 같은 기준의 우도를 얻기 어려워 뺐습니다.||Inverse Gaussian was left out: with random effects a likelihood on the same footing is hard to obtain.}}")
   if (!length(re)) warn <- c(warn, "{{랜덤효과가 없습니다. 한 사람/집단에서 여러 번 측정했다면 ID를 랜덤효과로 넣는 것을 권합니다.||No random effect. If the same person or group was measured repeatedly, add its ID as a random effect.}}")
   if (kind == "binary") warn <- c(warn, "{{0/1 자료의 분포는 이항분포로 정해져 있습니다. 여기서 비교하는 것은 링크 함수이고, 분포 진단으로는 문제가 잘 드러나지 않을 수 있습니다.||0/1 data are always binomial. What is compared here is the link function, and distribution diagnostics detect little.}}")
+  if (length(S$lx)) warn <- c(warn, if (length(intersect(S$lx, S$zx))) "{{로그로 바꾼 X는 로그를 취한 뒤 표준화했습니다.||Log-transformed X were logged first, then standardized.}}" else "{{로그(자연로그)로 바꾼 X의 계수는 X가 약 2.72배가 될 때의 변화입니다.||For X in natural logs, a coefficient is the change when X is multiplied by about 2.72.}}")
+  if (kind %in% c("binary", "trials", "count")) for (k in fac) {
+    tot1 <- if (kind == "trials") tot else if (kind == "binary") rep(1, n) else rep(Inf, n)
+    one <- names(which(tapply(seq_len(n), d[[k]], function(i) all(y[i] == 0) || all(y[i] == tot1[i]))))
+    if (length(one)) warn <- c(warn, bf("{{'%s'의 %s에서는 Y가 한쪽 값뿐입니다. 분리(separation)로 계수와 표준오차가 매우 커질 수 있습니다. 수준을 합치거나 표를 확인해 보시기를 권합니다.||In '%s', level(s) %s have only one kind of Y. Separation may make the coefficient and standard error blow up. Consider merging levels or checking the table.}}", lab(k), paste(one, collapse = ", ")))
+  }
   if (kind == "ordinal") {
     gap <- setdiff(seq(min(y), max(y)), y)
     if (int && length(gap)) warn <- c(warn, bf("{{중간 단계 %s은(는) 응답이 없어서, 나온 단계끼리 이어서 계산합니다.||Level(s) %s were never chosen; the observed levels are treated as adjacent.}}", paste(gap, collapse = ", ")))
@@ -311,6 +322,14 @@ fit_one <- function(i) {
     if (inherits(m, "clmm")) { if (any(!is.finite(suppressWarnings(sqrt(diag(vcov(m))))))) { ok <- FALSE; msg <- c(msg, "{{표준오차 계산 실패 (추정 불안정)||standard errors could not be computed (unstable)}}") } }
     else if (m$convergence$code > 0) { ok <- FALSE; msg <- c(msg, "{{수렴하지 않음||did not converge}}") }
   }
+  if (S$kind %in% c("binary", "trials", "count") && k$engine == "tmb") {
+    cc <- tryCatch(summary(m)$coefficients$cond, error = function(e) NULL)
+    if (!is.null(cc)) {
+      X <- model.matrix(as.formula(paste("~", S$rhs)), S$d); mx <- apply(abs(X), 2, max)[rownames(cc)]
+      if (any(!is.finite(cc[, 2])) || any(cc[, 2] * mx > 20, na.rm = TRUE) || any(abs(cc[, 1]) * mx > 15 & cc[, 2] * mx > 5, na.rm = TRUE))
+        msg <- c(msg, "{{분리(separation) 가능성: 계수나 표준오차가 매우 큼||possible separation: very large coefficient or standard error}}")
+    }
+  }
   l0 <- logLik(m); df <- attr(l0, "df"); n <- nrow(S$d); ll <- as.numeric(l0)
   if (k$engine == "ln") {
     ll <- ll - sum(log(S$y[S$y > 0]))
@@ -352,6 +371,7 @@ code_for <- function(i, file, sep = ",", enc = "UTF-8") {
     sprintf("used <- c(%s)", paste(encodeString(lab(used), quote = "\""), collapse = ", ")),
     "d <- d[complete.cases(d[used]), ]")
   if (length(fac)) o <- c(o, sprintf("d$%1$s <- factor(d$%1$s)", sapply(fac, q)))
+  for (z in S$lx) o <- c(o, sprintf("d$%1$s <- log(d$%1$s)", q(z)))
   for (z in c(S$zx, if (S$zy) S$yv)) o <- c(o, sprintf("d$%1$s <- as.numeric(scale(d$%1$s))", q(z)))
   if (S$kind == "binary") o <- c(o, sprintf("d$%1$s <- as.integer(d$%1$s == sort(unique(d$%1$s))[2])", q(S$yv)))
   if (k$engine == "tmb") o <- c(o, sprintf("m <- glmmTMB(%s, data = d,\n             family = %s, ziformula = %s)", bt(S$f), k$fam, paste0(k$zi, if (k$link %in% c("identity", "inverse") && grepl("Gamma", k$fam))

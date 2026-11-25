@@ -70,6 +70,7 @@ py_for <- function(i, file, sep = ",", enc = "UTF-8") {
     sprintf("used = %s", Q(I(lab(used)))), "d = d.dropna(subset=used).copy()", sprintf("ycol = %s", Q(lab(S$yv))))
   for (f in setdiff(fac, S$re)) { lv <- levels(S$d[[f]])
     o <- c(o, sprintf("%1$s = pd.Categorical(%1$s, categories=%2$s)", col(f), if (is.numeric(S$raw[[f]])) paste0("[", paste(lv, collapse = ", "), "]") else Q(I(lv)))) }
+  for (z in S$lx) o <- c(o, sprintf("%1$s = np.log(%1$s)", col(z)))
   for (z in c(S$zx, if (S$zy) S$yv)) o <- c(o, sprintf("%1$s = (%1$s - %1$s.mean()) / %1$s.std(){{  # 표준화||  # standardize}}", col(z)))
   if (S$kind == "binary") o <- c(o, sprintf("%1$s = (%1$s == %2$s).astype(int)", yv, Q(S$succ)))
   o <- c(o, "", body, "print(m.summary())")

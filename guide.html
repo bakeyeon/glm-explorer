@@ -14,6 +14,7 @@ code{background:var(--sf);border:1px solid var(--grid);border-radius:4px;padding
 html[lang=en] .ko,html[lang=ko] .en{display:none!important}
 svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color-scheme:dark){:root{--s2:#d95926}}
 .toc{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;margin:14px 0}h2{scroll-margin-top:12px}
+pre.one{background:var(--sf);border:1px solid var(--grid);border-radius:8px;padding:12px 14px;overflow-x:auto;line-height:1.6}pre.one code{border:0;padding:0;background:none}
 </style></head><body><main>
 <div class="top"><h1><span class="en">Beginner guide</span><span class="ko">초보자 안내</span></h1><div role="group" aria-label="Language"><button data-l="en">English</button> <button data-l="ko">한국어</button></div></div>
 <p><a href="https://bakeyeon.github.io/glm-explorer/">GLM Distribution Explorer</a></p>
@@ -23,10 +24,43 @@ svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color
 <div class="box"><p><b>In short:</b> load a CSV, check the suggested roles, run, look at ΔAIC and the Q-Q plots, then copy the code of the model you want to work on.</p></div>
 
 <nav class="toc"></nav>
+<h2>One line of R, piece by piece</h2>
+<pre class="one"><code>m &lt;- glm(duration ~ log(freq) * group + length,
+         family = Gamma(link = "log"), data = d)</code></pre>
+<div class="tw"><table><tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>m &lt;-</code></td><td>stores the result under the name m</td></tr>
+<tr><td><code>glm( )</code></td><td>fits a generalized linear model</td></tr>
+<tr><td><code>duration</code></td><td>Y, the outcome</td></tr>
+<tr><td><code>~</code></td><td>"is explained by": Y on the left, X on the right</td></tr>
+<tr><td><code>log(freq)</code></td><td>X on a log scale</td></tr>
+<tr><td><code>*</code></td><td>both effects <b>and</b> their interaction: <code>log(freq) + group + log(freq):group</code></td></tr>
+<tr><td><code>+ length</code></td><td>one more X, without an interaction</td></tr>
+<tr><td><code>family = Gamma</code></td><td>how Y scatters around its mean</td></tr>
+<tr><td><code>link = "log"</code></td><td>the effect of X multiplies the mean</td></tr>
+<tr><td><code>data = d</code></td><td>the data frame to look in</td></tr></table></div>
+<p>In words: "duration is explained by log frequency, group, their interaction, and length, assuming Gamma scatter and multiplying effects."</p>
+<p><b>Change one piece, get another model.</b> The app does this step for you by trying the candidates side by side:</p><div class="tw"><table><tr><th>Change</th><th>What it does</th></tr>
+<tr><td><code>family = Gamma(link = "inverse")</code></td><td>same distribution, other link: sign and size of the coefficients change (see 8)</td></tr>
+<tr><td><code>family = poisson</code></td><td>for counts; negative binomial, <code>MASS::glm.nb()</code>, if overdispersed</td></tr>
+<tr><td><code>family = binomial</code></td><td>for 0/1 answers</td></tr>
+<tr><td><code>lm(log(duration) ~ ...)</code></td><td>Lognormal: now about the geometric mean</td></tr>
+<tr><td><code>glmmTMB(... + (1 | speaker), ...)</code></td><td>the same speaker appears many times</td></tr></table></div>
+<p><b>Then <code>summary(m)</code> prints:</b></p><div class="tw"><table><tr><th>Output</th><th>Meaning</th></tr>
+<tr><td><code>Estimate</code></td><td>the coefficient, on the link scale (with log, use <code>exp()</code>)</td></tr>
+<tr><td><code>Std. Error</code></td><td>its uncertainty; in the hundreds often means separation (see 6)</td></tr>
+<tr><td><code>t value, z value</code></td><td>Estimate divided by Std. Error</td></tr>
+<tr><td><code>Pr(&gt;|t|), Pr(&gt;|z|)</code></td><td>p-value</td></tr>
+<tr><td><code>Null deviance</code></td><td>misfit of a model with no X</td></tr>
+<tr><td><code>Residual deviance</code></td><td>misfit of your model; the drop from Null is what X explains</td></tr>
+<tr><td><code>AIC</code></td><td>for ranking models (see 4)</td></tr>
+<tr><td><code>Number of Fisher Scoring iterations</code></td><td>steps until it settled; a large number can be a warning sign</td></tr></table></div>
+<p class="mut">In the app: duration = Y, freq = X numeric (log), group = X categorical, length = X numeric. The interaction tick box adds every pair, so <code>length</code> would interact too; remove what you do not need in the copied code.</p>
+
 <h2>If you already write glm() in R</h2>
 <p>What you may have learned in class, and where it is in the app:</p><div class="tw"><table><tr><th>In R</th><th>In the app</th><th>Meaning</th></tr>
 <tr><td><code>y ~ a + b</code></td><td>y as Y, a and b as X</td><td>each effect on its own</td></tr>
 <tr><td><code>y ~ a * b</code></td><td>tick "Include two-way interactions"</td><td>same as <code>a + b + a:b</code> (see 9)</td></tr>
+<tr><td><code>y ~ log(freq)</code></td><td>freq as X numeric (log)</td><td>common for frequencies; values must be above 0</td></tr>
 <tr><td><code>family = Gamma(link = "log")</code></td><td>choose the Y type; the candidates are run for you</td><td>distribution and link</td></tr>
 <tr><td><code>family = Gamma</code></td><td>tick "Also compare links"</td><td>no link given means inverse (see 8)</td></tr>
 <tr><td><code>(1 | id)</code></td><td>id as Random effect</td><td>each person has their own level</td></tr>
@@ -46,7 +80,7 @@ svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color
 <div class="tw"><table><tr><th>Question</th><th>Role</th></tr>
 <tr><td>What did I measure?</td><td><b>Y (outcome)</b>, one column</td></tr>
 <tr><td>What do I expect to influence it? Is it a group or condition?</td><td><b>X categorical</b></td></tr>
-<tr><td>Is it an amount, such as age?</td><td><b>X numeric</b></td></tr>
+<tr><td>Is it an amount, such as age?</td><td><b>X numeric</b>, or <b>X numeric (log)</b> for word frequency and similar</td></tr>
 <tr><td>Did the same person, class or item appear several times?</td><td><b>Random effect</b> for that ID column</td></tr>
 <tr><td>Did observation time or opportunity differ between rows, for a count Y?</td><td><b>Exposure</b></td></tr>
 <tr><td>For successes out of several tries: the success column</td><td><b>Y</b>, plus the failure column as <b>Failures</b> or the total as <b>Trials</b></td></tr>
@@ -76,8 +110,11 @@ svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color
 <p>Points on the diagonal are good. The gray band is what chance allows. Both ends often drift a little, so start with the middle.</p>
 <div class="q" data-q="en"></div>
 
+<p><b>0/1 data (binomial) are different.</b> Their ordinary residuals pile up at two ends and never look normal, even when the model is right. A histogram with two humps, an odd-looking <code>qqnorm</code> plot or a significant <code>shapiro.test</code> is expected there and does not mean the model is wrong. This app uses randomized quantile residuals, but with single 0/1 answers even those reveal little.</p>
+<p>For other data too, <code>shapiro.test</code> becomes significant for tiny deviations once there are many rows. The plots usually tell you more. For Gamma, Poisson and so on, normal raw residuals are not expected either.</p>
+
 <h2>6. If it is a tie, or nothing fits</h2>
-<ul><li><b>Tie:</b> the one that is common in your field or easier to explain is a reasonable choice.</li><li><b>Nothing fits:</b> look for a forgotten ID, a missing X, typing errors or extreme values in Y, or a curved relationship.</li><li><b>Did not converge:</b> try standardizing numeric X, dropping the random slope, or using fewer X.</li></ul>
+<ul><li><b>Tie:</b> the one that is common in your field or easier to explain is a reasonable choice.</li><li><b>Nothing fits:</b> look for a forgotten ID, a missing X, typing errors or extreme values in Y, or a curved relationship.</li><li><b>Did not converge:</b> try standardizing numeric X, dropping the random slope, or using fewer X.</li><li><b>Separation:</b> an estimate such as 39 with a standard error of 969 usually means that some level of X has only one kind of Y (all 0 or all 1). In R, <code>table(d$x, d$y)</code> shows it. Merging levels, or a penalized method such as Firth's, are common ways forward.</li><li><b>NA coefficients in R:</b> some combination of X levels has no data, or one X can be worked out from the others.</li></ul>
 
 <h2>7. Put the coefficients into words</h2>
 <p>After "Choose this" you see a table. For a categorical X, each row compares one level with the reference level (the alphabetically first).</p>
@@ -117,10 +154,43 @@ svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color
 <div class="box"><p><b>한눈에 보기:</b> CSV를 올리고, 추천된 역할을 확인하고, 실행한 뒤 ΔAIC와 Q-Q 플롯을 봅니다. 그다음 작업할 모델의 코드를 복사하시면 됩니다.</p></div>
 
 <nav class="toc"></nav>
+<h2>R 코드 한 줄 풀어 보기</h2>
+<pre class="one"><code>m &lt;- glm(duration ~ log(freq) * group + length,
+         family = Gamma(link = "log"), data = d)</code></pre>
+<div class="tw"><table><tr><th>조각</th><th>뜻</th></tr>
+<tr><td><code>m &lt;-</code></td><td>결과를 m이라는 이름으로 저장</td></tr>
+<tr><td><code>glm( )</code></td><td>일반화 선형 모형을 적합</td></tr>
+<tr><td><code>duration</code></td><td>Y, 결과 변수</td></tr>
+<tr><td><code>~</code></td><td>"~로 설명": 왼쪽이 Y, 오른쪽이 X</td></tr>
+<tr><td><code>log(freq)</code></td><td>로그 척도의 X</td></tr>
+<tr><td><code>*</code></td><td>두 효과와 교호작용을 <b>함께</b> 넣음: <code>log(freq) + group + log(freq):group</code></td></tr>
+<tr><td><code>+ length</code></td><td>교호작용 없이 X 하나를 더함</td></tr>
+<tr><td><code>family = Gamma</code></td><td>Y가 평균 주변에 흩어지는 모양</td></tr>
+<tr><td><code>link = "log"</code></td><td>X의 효과가 평균에 곱해짐</td></tr>
+<tr><td><code>data = d</code></td><td>변수를 찾을 데이터 프레임</td></tr></table></div>
+<p>말로 풀면 "duration을 로그 빈도, 집단, 둘의 교호작용, 길이로 설명하되, 흩어지는 모양은 Gamma이고 효과는 곱해진다고 가정"한 것입니다.</p>
+<p><b>한 조각을 바꾸면 다른 모델이 됩니다.</b> 앱은 이 단계를 대신해 후보들을 나란히 돌려 줍니다.</p><div class="tw"><table><tr><th>바꾼 조각</th><th>달라지는 점</th></tr>
+<tr><td><code>family = Gamma(link = "inverse")</code></td><td>분포는 같고 링크만 다름. 계수의 부호와 크기가 달라짐 (8번 참고)</td></tr>
+<tr><td><code>family = poisson</code></td><td>횟수 자료. 과산포이면 음이항 <code>MASS::glm.nb()</code></td></tr>
+<tr><td><code>family = binomial</code></td><td>0/1 응답</td></tr>
+<tr><td><code>lm(log(duration) ~ ...)</code></td><td>Lognormal. 기하평균에 대한 모형이 됨</td></tr>
+<tr><td><code>glmmTMB(... + (1 | speaker), ...)</code></td><td>같은 화자가 여러 번 나올 때</td></tr></table></div>
+<p><b><code>summary(m)</code>을 실행하면 나오는 것</b></p><div class="tw"><table><tr><th>출력</th><th>뜻</th></tr>
+<tr><td><code>Estimate</code></td><td>링크 척도의 계수 (log이면 <code>exp()</code>로 바꿔 읽음)</td></tr>
+<tr><td><code>Std. Error</code></td><td>계수의 불확실성. 수백처럼 크면 분리인 경우가 많음 (6번 참고)</td></tr>
+<tr><td><code>t value, z value</code></td><td>Estimate를 Std. Error로 나눈 값</td></tr>
+<tr><td><code>Pr(&gt;|t|), Pr(&gt;|z|)</code></td><td>p값</td></tr>
+<tr><td><code>Null deviance</code></td><td>X가 하나도 없는 모델의 어긋남</td></tr>
+<tr><td><code>Residual deviance</code></td><td>내 모델의 어긋남. Null에서 줄어든 만큼이 X의 설명</td></tr>
+<tr><td><code>AIC</code></td><td>모델 순위 비교용 (4번 참고)</td></tr>
+<tr><td><code>Number of Fisher Scoring iterations</code></td><td>답에 도달하기까지의 반복 횟수. 크면 점검해 볼 신호일 수 있음</td></tr></table></div>
+<p class="mut">앱에서는 duration을 Y, freq를 X 수치 (log), group을 X 범주, length를 X 수치로 두시면 됩니다. 교호작용 체크는 모든 쌍을 넣기 때문에 <code>length</code>와의 교호작용도 들어갑니다. 필요하지 않은 항은 복사한 코드에서 빼실 수 있습니다.</p>
+
 <h2>R에서 glm()을 써 보셨다면</h2>
 <p>수업에서 배우신 코드가 앱의 어디에 해당하는지 정리했습니다.</p><div class="tw"><table><tr><th>R 코드</th><th>앱에서는</th><th>뜻</th></tr>
 <tr><td><code>y ~ a + b</code></td><td>y는 Y, a와 b는 X</td><td>각각의 효과</td></tr>
 <tr><td><code>y ~ a * b</code></td><td>"X끼리 2원 교호작용 포함" 체크</td><td><code>a + b + a:b</code>와 같음 (9번 참고)</td></tr>
+<tr><td><code>y ~ log(freq)</code></td><td>freq를 X 수치 (log)로</td><td>빈도에 흔히 씀. 값이 0보다 커야 계산됨</td></tr>
 <tr><td><code>family = Gamma(link = "log")</code></td><td>Y 유형을 고르면 후보로 함께 실행</td><td>분포와 링크</td></tr>
 <tr><td><code>family = Gamma</code></td><td>"링크 함수도 비교" 체크</td><td>링크를 적지 않으면 inverse (8번 참고)</td></tr>
 <tr><td><code>(1 | id)</code></td><td>id를 랜덤효과로</td><td>사람마다 다른 기본 수준</td></tr>
@@ -140,7 +210,7 @@ svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color
 <div class="tw"><table><tr><th>열의 내용</th><th>역할</th></tr>
 <tr><td>측정한 결과</td><td><b>Y (결과)</b>, 열 하나</td></tr>
 <tr><td>Y에 영향을 줄 것으로 보는 집단이나 조건</td><td><b>X 범주</b></td></tr>
-<tr><td>나이처럼 크기가 있는 값</td><td><b>X 수치</b></td></tr>
+<tr><td>나이처럼 크기가 있는 값</td><td><b>X 수치</b>, 단어 빈도 등은 <b>X 수치 (log)</b></td></tr>
 <tr><td>여러 번 나오는 사람, 학급, 문항의 ID</td><td><b>랜덤효과</b></td></tr>
 <tr><td>횟수를 셌고 행마다 다른 관찰 시간이나 기회</td><td><b>노출량</b></td></tr>
 <tr><td>여러 번 시도한 성공 횟수</td><td>성공 열을 <b>Y</b>로, 실패 열은 <b>실패 수</b> 또는 전체 열은 <b>시행 수</b>로</td></tr>
@@ -170,8 +240,11 @@ svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color
 <p>점이 대각선에 붙어 있을수록 좋습니다. 회색 띠는 우연히 벗어날 수 있는 범위입니다. 양 끝은 조금 벗어나는 일이 흔하므로 가운데부터 보시면 됩니다.</p>
 <div class="q" data-q="ko"></div>
 
+<p><b>0/1 자료(이항)는 조금 다릅니다.</b> 모델이 맞아도 보통의 잔차는 양 끝에 몰리고 정규분포처럼 보이지 않습니다. 두 봉우리 히스토그램, 이상한 <code>qqnorm</code> 그림, 유의한 <code>shapiro.test</code>는 흔한 결과이며 모델이 틀렸다는 뜻으로 보기는 어렵습니다. 이 앱은 무작위화 분위수 잔차를 쓰지만, 0/1 응답 하나하나에서는 이것으로도 드러나는 것이 적습니다.</p>
+<p>다른 자료에서도 행이 많으면 <code>shapiro.test</code>는 작은 어긋남에 유의하게 나옵니다. 보통은 그림이 더 많은 것을 알려 줍니다. Gamma, Poisson 등에서도 원래 잔차가 정규분포일 필요는 없습니다.</p>
+
 <h2>6. 동률이거나 맞는 분포가 없을 때</h2>
-<ul><li><b>동률:</b> 분야에서 흔히 쓰거나 설명하기 쉬운 쪽도 무난한 선택입니다.</li><li><b>맞는 분포가 없을 때:</b> 빠뜨린 ID, 빠진 X, Y의 입력 오류나 극단값, 곡선 관계가 있는지 살펴보실 수 있습니다.</li><li><b>수렴하지 않을 때:</b> 수치 X 표준화, 랜덤 기울기 빼기, X 줄이기를 시도해 보실 수 있습니다.</li></ul>
+<ul><li><b>동률:</b> 분야에서 흔히 쓰거나 설명하기 쉬운 쪽도 무난한 선택입니다.</li><li><b>맞는 분포가 없을 때:</b> 빠뜨린 ID, 빠진 X, Y의 입력 오류나 극단값, 곡선 관계가 있는지 살펴보실 수 있습니다.</li><li><b>수렴하지 않을 때:</b> 수치 X 표준화, 랜덤 기울기 빼기, X 줄이기를 시도해 보실 수 있습니다.</li><li><b>분리(separation):</b> 추정치 39에 표준오차 969처럼 나오면 X의 어떤 수준에서 Y가 한쪽 값(모두 0 또는 모두 1)뿐인 경우가 많습니다. R에서 <code>table(d$x, d$y)</code>로 확인하실 수 있습니다. 수준을 합치거나 Firth 방법 같은 벌점 추정을 쓰기도 합니다.</li><li><b>R에서 계수가 NA일 때:</b> X 수준의 어떤 조합에 데이터가 없거나, 한 X가 다른 X로부터 정해지는 경우일 수 있습니다.</li></ul>
 
 <h2>7. 계수를 말로 풀기</h2>
 <p>"이 분포로 확정"을 누르면 표가 나옵니다. 범주 X의 각 행은 기준 수준(알파벳순 첫 번째)과 비교한 값입니다.</p>
