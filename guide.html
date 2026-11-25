@@ -86,7 +86,7 @@ pre.one{background:var(--sf);border:1px solid var(--grid);border-radius:8px;padd
 <tr><td>For successes out of several tries: the success column</td><td><b>Y</b>, plus the failure column as <b>Failures</b> or the total as <b>Trials</b></td></tr>
 <tr><td>Row numbers, memos, dates, other outcomes</td><td><b>Not used</b></td></tr></table></div>
 <div class="box"><p><b>The one to look at twice:</b> if the same person answered more than once and the ID is not a random effect, p-values tend to come out too small.</p></div>
-<div class="box"><p><b>Copying rows to balance groups:</b> resampling 35 people up to 112 leaves the mean about the same but makes p-values too small, because the same people are counted several times. Unequal group sizes are usually fine as they are. To match a population (for example by gender or age), weights, such as in the R package <code>survey</code>, or adding those variables as X are common options.</p></div>
+<div class="box"><p><b>Copying rows to balance groups:</b> counting each person four times, for example, leaves the mean about the same but makes p-values too small. The data look larger than they are. Unequal group sizes are usually fine as they are. To match a population (for example by gender or age), weights, such as in the R package <code>survey</code>, or adding those variables as X are common options.</p></div>
 
 <h2>3. Check the type of Y</h2>
 <div class="tw"><table><tr><th>What Y looks like</th><th>Type</th><th>Distributions compared</th></tr>
@@ -115,7 +115,7 @@ pre.one{background:var(--sf);border:1px solid var(--grid);border-radius:8px;padd
 <p>For other data too, <code>shapiro.test</code> becomes significant for tiny deviations once there are many rows. The plots usually tell you more. For Gamma, Poisson and so on, normal raw residuals are not expected either.</p>
 
 <h2>6. If it is a tie, or nothing fits</h2>
-<ul><li><b>Tie:</b> the one that is common in your field or easier to explain is a reasonable choice.</li><li><b>Nothing fits:</b> look for a forgotten ID, a missing X, typing errors or extreme values in Y, or a curved relationship.</li><li><b>Did not converge:</b> try standardizing numeric X, dropping the random slope, or using fewer X.</li><li><b>Separation:</b> an estimate such as 39 with a standard error of 969 usually means that some level of X has only one kind of Y (all 0 or all 1). In R, <code>table(d$x, d$y)</code> shows it. Merging levels, or a penalized method such as Firth's, are common ways forward.</li><li><b>NA coefficients in R:</b> some combination of X levels has no data, or one X can be worked out from the others.</li></ul>
+<ul><li><b>Tie:</b> the one that is common in your field or easier to explain is a reasonable choice.</li><li><b>Nothing fits:</b> look for a forgotten ID, a missing X, typing errors or extreme values in Y, or a curved relationship.</li><li><b>Did not converge:</b> try standardizing numeric X, dropping the random slope, or using fewer X.</li><li><b>Separation:</b> an estimate such as 20 with a standard error of 1000 usually means that some level of X has only one kind of Y (all 0 or all 1). In R, <code>table(d$x, d$y)</code> shows it. Merging levels, or a penalized method such as Firth's, are common ways forward.</li><li><b>NA coefficients in R:</b> some combination of X levels has no data, or one X can be worked out from the others.</li></ul>
 
 <h2>7. Put the coefficients into words</h2>
 <p>After "Choose this" you see a table. For a categorical X, each row compares one level with the reference level (the alphabetically first).</p>
@@ -217,7 +217,7 @@ pre.one{background:var(--sf);border:1px solid var(--grid);border-radius:8px;padd
 <tr><td>여러 번 시도한 성공 횟수</td><td>성공 열을 <b>Y</b>로, 실패 열은 <b>실패 수</b> 또는 전체 열은 <b>시행 수</b>로</td></tr>
 <tr><td>행 번호, 메모, 날짜, 다른 결과 변수</td><td><b>사용 안 함</b></td></tr></table></div>
 <div class="box"><p><b>한 번 더 볼 부분:</b> 같은 사람이 여러 번 답했는데 ID가 랜덤효과에 없으면 p값이 실제보다 작게 나오기 쉽습니다.</p></div>
-<div class="box"><p><b>집단 크기를 맞추려고 행을 복제할 때:</b> 35명을 다시 뽑아 112명으로 늘리면 평균은 거의 그대로인데, 같은 사람을 여러 번 세게 되어 p값이 실제보다 작게 나옵니다. 집단의 인원이 서로 달라도 대체로 그대로 분석하실 수 있습니다. 성별이나 연령을 모집단에 맞추려면 R의 <code>survey</code> 패키지 같은 가중치나, 그 변수를 X로 넣는 방법이 흔히 쓰입니다.</p></div>
+<div class="box"><p><b>집단 크기를 맞추려고 행을 복제할 때:</b> 예를 들어 한 사람을 네 번씩 세면 평균은 거의 그대로인데, 데이터가 실제보다 많아 보여 p값이 실제보다 작게 나옵니다. 집단의 인원이 서로 달라도 대체로 그대로 분석하실 수 있습니다. 성별이나 연령을 모집단에 맞추려면 R의 <code>survey</code> 패키지 같은 가중치나, 그 변수를 X로 넣는 방법이 흔히 쓰입니다.</p></div>
 
 <h2>3. Y 유형 확인</h2>
 <div class="tw"><table><tr><th>Y의 모습</th><th>유형</th><th>비교하는 분포</th></tr>
@@ -246,7 +246,7 @@ pre.one{background:var(--sf);border:1px solid var(--grid);border-radius:8px;padd
 <p>다른 자료에서도 행이 많으면 <code>shapiro.test</code>는 작은 어긋남에 유의하게 나옵니다. 보통은 그림이 더 많은 것을 알려 줍니다. Gamma, Poisson 등에서도 원래 잔차가 정규분포일 필요는 없습니다.</p>
 
 <h2>6. 동률이거나 맞는 분포가 없을 때</h2>
-<ul><li><b>동률:</b> 분야에서 흔히 쓰거나 설명하기 쉬운 쪽도 무난한 선택입니다.</li><li><b>맞는 분포가 없을 때:</b> 빠뜨린 ID, 빠진 X, Y의 입력 오류나 극단값, 곡선 관계가 있는지 살펴보실 수 있습니다.</li><li><b>수렴하지 않을 때:</b> 수치 X 표준화, 랜덤 기울기 빼기, X 줄이기를 시도해 보실 수 있습니다.</li><li><b>분리(separation):</b> 추정치 39에 표준오차 969처럼 나오면 X의 어떤 수준에서 Y가 한쪽 값(모두 0 또는 모두 1)뿐인 경우가 많습니다. R에서 <code>table(d$x, d$y)</code>로 확인하실 수 있습니다. 수준을 합치거나 Firth 방법 같은 벌점 추정을 쓰기도 합니다.</li><li><b>R에서 계수가 NA일 때:</b> X 수준의 어떤 조합에 데이터가 없거나, 한 X가 다른 X로부터 정해지는 경우일 수 있습니다.</li></ul>
+<ul><li><b>동률:</b> 분야에서 흔히 쓰거나 설명하기 쉬운 쪽도 무난한 선택입니다.</li><li><b>맞는 분포가 없을 때:</b> 빠뜨린 ID, 빠진 X, Y의 입력 오류나 극단값, 곡선 관계가 있는지 살펴보실 수 있습니다.</li><li><b>수렴하지 않을 때:</b> 수치 X 표준화, 랜덤 기울기 빼기, X 줄이기를 시도해 보실 수 있습니다.</li><li><b>분리(separation):</b> 추정치 20에 표준오차 1000처럼 나오면 X의 어떤 수준에서 Y가 한쪽 값(모두 0 또는 모두 1)뿐인 경우가 많습니다. R에서 <code>table(d$x, d$y)</code>로 확인하실 수 있습니다. 수준을 합치거나 Firth 방법 같은 벌점 추정을 쓰기도 합니다.</li><li><b>R에서 계수가 NA일 때:</b> X 수준의 어떤 조합에 데이터가 없거나, 한 X가 다른 X로부터 정해지는 경우일 수 있습니다.</li></ul>
 
 <h2>7. 계수를 말로 풀기</h2>
 <p>"이 분포로 확정"을 누르면 표가 나옵니다. 범주 X의 각 행은 기준 수준(알파벳순 첫 번째)과 비교한 값입니다.</p>
