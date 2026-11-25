@@ -12,6 +12,7 @@ main{max-width:760px;margin:0 auto;padding:28px 16px 80px}h1{font-size:26px;line
 .q{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;margin:12px 0}.q figure{margin:0}.q svg{width:100%;height:auto;display:block}.q figcaption{font-size:14px;line-height:1.5}.mut{color:var(--mut);font-size:14px}
 code{background:var(--sf);border:1px solid var(--grid);border-radius:4px;padding:0 4px;font-size:14px}
 html[lang=en] .ko,html[lang=ko] .en{display:none!important}
+svg text{fill:var(--ink2);font-size:12px}:root{--s2:#eb6834}@media(prefers-color-scheme:dark){:root{--s2:#d95926}}
 </style></head><body><main>
 <div class="top"><h1><span class="en">Beginner guide</span><span class="ko">초보자 안내</span></h1><div role="group" aria-label="Language"><button data-l="en">English</button> <button data-l="ko">한국어</button></div></div>
 <p><a href="https://bakeyeon.github.io/glm-explorer/">GLM Distribution Explorer</a></p>
@@ -33,6 +34,7 @@ html[lang=en] .ko,html[lang=ko] .en{display:none!important}
 <tr><td>Is it an amount, such as age?</td><td><b>X numeric</b></td></tr>
 <tr><td>Did the same person, class or item appear several times?</td><td><b>Random effect</b> for that ID column</td></tr>
 <tr><td>Did observation time or opportunity differ between rows, for a count Y?</td><td><b>Exposure</b></td></tr>
+<tr><td>For successes out of several tries: the success column</td><td><b>Y</b>, plus the failure column as <b>Failures</b> or the total as <b>Trials</b></td></tr>
 <tr><td>Row numbers, memos, dates, other outcomes</td><td><b>Not used</b></td></tr></table></div>
 <div class="box"><p><b>The one to look at twice:</b> if the same person answered more than once and the ID is not a random effect, p-values tend to come out too small.</p></div>
 
@@ -50,7 +52,10 @@ html[lang=en] .ko,html[lang=ko] .en{display:none!important}
 
 <h2>4. Run and look at two things</h2>
 <ol><li><b>ΔAIC:</b> 0 is the best of this list. Up to 2 is practically a tie.</li><li><b>Diagnostics:</b> ✓, △ or ✕. A low ΔAIC with ✕ means "best of the list, but still does not fit well".</li></ol>
-<p>AICc, BIC and the rest can wait until you need them.</p>
+<p><b>What is AIC?</b> A score for how well a model describes the data, with a penalty for every extra parameter. A model with more parameters almost always follows the data more closely, so the penalty keeps it from winning just by being complicated. <b>Lower is better.</b></p>
+<p><b>ΔAIC</b> is the gap to the lowest one, and the gap is what matters:</p><div class="tw"><table><tr><th>Model</th><th>AIC</th><th>ΔAIC</th><th>In words</th></tr><tr><td>Gamma</td><td>1200.0</td><td>0</td><td>lowest here</td></tr><tr><td>Lognormal</td><td>1201.5</td><td>1.5</td><td>practically a tie</td></tr><tr><td>Gaussian</td><td>1238.0</td><td>38</td><td>clearly behind</td></tr></table></div>
+<ul><li>The size of AIC itself (1200 or −50) has no meaning. Negative values are fine.</li><li>AIC can be compared only for the same Y on the same rows. A model for log(Y) and one for raw Y cannot be compared directly; the app corrects this for Lognormal.</li><li>It ranks this list only. If every candidate is poor, something still comes first, which is why the diagnostics matter.</li></ul>
+<p class="mut">AICc is AIC adjusted for small samples. BIC penalizes extra parameters more strongly unless the sample is very small. If they point to different models, the candidates are probably close.</p>
 
 <h2>5. Read the Q-Q plots</h2>
 <p>Points on the diagonal are good. The gray band is what chance allows. Both ends often drift a little, so start with the middle.</p>
@@ -67,15 +72,29 @@ html[lang=en] .ko,html[lang=ko] .en{display:none!important}
 <tr><td>Lognormal</td><td>conditionB exp 1.13</td><td>The geometric mean for B is about 1.13 times A</td></tr>
 <tr><td>Binomial (logit)</td><td>conditionB exp 2.0</td><td>The odds for B are about twice those for A (not "twice as likely")</td></tr>
 <tr><td>Ordinal (logit)</td><td>uinew estimate 0.9</td><td>"new" shifts answers toward higher categories; exp(0.9) ≈ 2.5 is an odds ratio</td></tr></table></div>
-<ul><li>If the 95% interval excludes 0 (or 1 for exp), the data are hard to reconcile with "no difference". If it includes it, that is not proof of no difference.</li><li>With random effects, log- and logit-link effects describe comparisons at the same random-effect level (for example the same person).</li><li>With interactions, a single row no longer means "the overall effect".</li><li>With Gamma (inverse), a positive coefficient means a lower mean.</li></ul>
+<ul><li>If the 95% interval excludes 0 (or 1 for exp), the data are hard to reconcile with "no difference". If it includes it, that is not proof of no difference.</li><li>With random effects, log- and logit-link effects describe comparisons at the same random-effect level (for example the same person).</li><li>With interactions, a single row no longer means "the overall effect" (see 9).</li><li>With Gamma (inverse), a positive coefficient means a lower mean (see 8).</li></ul>
 
-<h2>8. Use the code in R</h2>
+<h2>8. Gamma: log or inverse link</h2>
+<p>The distribution is Gamma in both cases. <b>The link decides how X changes the mean.</b></p><div class="tw"><table><tr><th></th><th>Gamma (log)</th><th>Gamma (inverse)</th></tr><tr><td>What adds up</td><td>log of the mean</td><td>1 / mean</td></tr><tr><td>Effect of X</td><td><b>multiplies</b> the mean</td><td><b>adds to</b> 1 / mean. For a time, that is a speed</td></tr><tr><td>Positive coefficient</td><td>higher mean</td><td><b>lower</b> mean (the sign looks reversed)</td></tr><tr><td>How to report</td><td>exp(estimate) is a ratio of means</td><td>predicted means are easier than the coefficient</td></tr><tr><td>Predicted mean</td><td>always positive</td><td>can break down when 1 / mean reaches 0 or below</td></tr></table></div>
+<p>Say a task takes 500 ms in A and 625 ms in B:</p><div class="tw"><table><tr><th>Link</th><th>Coefficient for B</th><th>Reading</th></tr><tr><td>log</td><td>0.223</td><td>exp(0.223) = 1.25: B takes 1.25 times as long</td></tr><tr><td>inverse</td><td>−0.0004</td><td>1/500 = 0.0020 becomes 1/625 = 0.0016: speed drops from 2.0 to 1.6 per second</td></tr></table></div>
+<p>With a numeric X (for example difficulty 0, 1, 2) the two links start to bend differently:</p><div class="tw"><table><tr><th>Difficulty</th><th>log</th><th>inverse</th></tr><tr><td>0</td><td>500 ms</td><td>500 ms (2.0 per second)</td></tr><tr><td>1</td><td>625 ms (× 1.25)</td><td>625 ms (1.6 per second)</td></tr><tr><td>2</td><td>781 ms (× 1.25)</td><td>833 ms (1.2 per second)</td></tr></table></div>
+<div class="lk"></div>
+<ul><li>With a single categorical X and no random effects, both links give the same predicted means and the same AIC. They differ with numeric X, several X without all interactions, or random effects.</li><li>Log is a common choice and easier to report. Inverse can suit a question about speed or rate.</li><li><b>In R, <code>Gamma()</code> without a link means inverse.</b> Writing <code>Gamma(link = "log")</code> avoids surprises.</li><li>Gamma (identity) adds directly to the mean in the original unit, but predictions may fall below 0.</li><li>In the app, tick "Also compare links" to see inverse and identity.</li></ul>
+
+<h2>9. Interactions</h2>
+<p><b>An interaction means the effect of one X depends on another X.</b> Suppose a score was measured with two tools, for experts and novices, and the averages are:</p><div class="tw"><table><tr><th></th><th>tool A</th><th>tool B</th><th>B − A</th></tr><tr><td>expert</td><td>8</td><td>9</td><td>+1</td></tr><tr><td>novice</td><td>10</td><td>14</td><td>+4</td></tr></table></div>
+<p>Tool B adds 1 for experts but 4 for novices. The effect differs, so the lines are not parallel:</p><div class="it"></div>
+<p>With a Gaussian model the table would read:</p><div class="tw"><table><tr><th>Row</th><th>Estimate</th><th>In words</th></tr><tr><td>(Intercept)</td><td>8</td><td>expert with tool A (both references)</td></tr><tr><td>toolB</td><td>1</td><td>effect of B <b>for experts only</b></td></tr><tr><td>groupnovice</td><td>2</td><td>novice vs expert <b>with tool A only</b></td></tr><tr><td>toolB:groupnovice</td><td>3</td><td>how much larger the effect of B is for novices</td></tr></table></div>
+<p>Novice with B: 8 + 1 + 2 + 3 = 14. The interaction 3 is the difference of the differences, 4 − 1.</p>
+<ul><li><b>Easy to misread:</b> with an interaction in the model, <code>toolB</code> is no longer the overall effect of B. It is the effect at the reference level of the other X.</li><li>Under a log link, exp(interaction) is a ratio of ratios. If B is 1.1 times A for experts and 1.4 times A for novices, it is 1.4 / 1.1 ≈ 1.27. Lines that are not parallel on the raw scale can be parallel on the log scale.</li><li>With a numeric X in the interaction, the other effect is read where that X is 0. Standardizing makes 0 its average.</li><li>It fits questions about whether effects differ. "Include two-way interactions" adds every pair, which can be too many for small data.</li></ul>
+
+<h2>10. Use the code in R</h2>
 <ol><li>Put the CSV in your R project folder. If you converted the data, use "Save this data as CSV".</li><li>Run the <code>install.packages</code> line once.</li><li>Paste the code and run it line by line.</li></ol>
 <div class="tw"><table><tr><th>Message</th><th>Usually means</th></tr><tr><td><code>cannot open file</code></td><td>The working folder is different. Check <code>getwd()</code>.</td></tr><tr><td><code>there is no package called</code></td><td>The install line has not been run.</td></tr><tr><td><code>object 'm' not found</code></td><td>An earlier line failed. Run again from the top.</td></tr></table></div>
 <p>The code is a starting point: adapt X, interactions and random effects to your design.</p>
 
-<h2>9. Words you will meet</h2>
-<div class="tw"><table><tr><td><b>Distribution</b></td><td>How Y scatters around its predicted value</td></tr><tr><td><b>Link</b></td><td>The scale on which X is added up. With log, effects are multiplications</td></tr><tr><td><b>Random effect</b></td><td>Lets each person or group have its own level</td></tr><tr><td><b>Overdispersion</b></td><td>More spread than the distribution expects</td></tr><tr><td><b>Zero-inflated, Hurdle</b></td><td>Models with a separate part for zeros</td></tr><tr><td><b>Residual</b></td><td>The gap between observed and predicted; here transformed so a good model gives a straight Q-Q line</td></tr><tr><td><b>Converge</b></td><td>The calculation settled on an answer</td></tr><tr><td><b>Singular</b></td><td>A random effect is too small or complex to estimate from these data</td></tr></table></div>
+<h2>11. Words you will meet</h2>
+<div class="tw"><table><tr><td><b>Distribution</b></td><td>How Y scatters around its predicted value</td></tr><tr><td><b>Link</b></td><td>The scale on which X is added up. With log, effects are multiplications</td></tr><tr><td><b>Random effect</b></td><td>Lets each person or group have its own level</td></tr><tr><td><b>Random slope</b></td><td>Lets the effect of X differ between people, not only their overall level</td></tr><tr><td><b>Reference level</b></td><td>The category the others are compared with</td></tr><tr><td><b>exp(estimate)</b></td><td>Turns a log-scale coefficient into a multiplier. 1 means no difference</td></tr><tr><td><b>Odds</b></td><td>Chance of yes divided by chance of no. 80% gives 0.8 / 0.2 = 4</td></tr><tr><td><b>Standard error</b></td><td>How much an estimate would typically vary over repeated samples</td></tr><tr><td><b>95% interval</b></td><td>Made by a method that covers the true value in about 95% of repeated samples, if the model is right</td></tr><tr><td><b>p-value</b></td><td>How likely a result at least this extreme would be if there were no effect and the model were right. Not the probability that there is no effect</td></tr><tr><td><b>Standardize</b></td><td>Subtract the mean and divide by the standard deviation; 1 then means one SD</td></tr><tr><td><b>Overdispersion</b></td><td>More spread than the distribution expects</td></tr><tr><td><b>Zero-inflated, Hurdle</b></td><td>Models with a separate part for zeros</td></tr><tr><td><b>Residual</b></td><td>The gap between observed and predicted; here transformed so a good model gives a straight Q-Q line</td></tr><tr><td><b>Converge</b></td><td>The calculation settled on an answer</td></tr><tr><td><b>Singular</b></td><td>A random effect is too small or complex to estimate from these data</td></tr></table></div>
 </section>
 
 <section class="ko">
@@ -95,6 +114,7 @@ html[lang=en] .ko,html[lang=ko] .en{display:none!important}
 <tr><td>나이처럼 크기가 있는 값</td><td><b>X 수치</b></td></tr>
 <tr><td>여러 번 나오는 사람, 학급, 문항의 ID</td><td><b>랜덤효과</b></td></tr>
 <tr><td>횟수를 셌고 행마다 다른 관찰 시간이나 기회</td><td><b>노출량</b></td></tr>
+<tr><td>여러 번 시도한 성공 횟수</td><td>성공 열을 <b>Y</b>로, 실패 열은 <b>실패 수</b> 또는 전체 열은 <b>시행 수</b>로</td></tr>
 <tr><td>행 번호, 메모, 날짜, 다른 결과 변수</td><td><b>사용 안 함</b></td></tr></table></div>
 <div class="box"><p><b>한 번 더 볼 부분:</b> 같은 사람이 여러 번 답했는데 ID가 랜덤효과에 없으면 p값이 실제보다 작게 나오기 쉽습니다.</p></div>
 
@@ -112,7 +132,10 @@ html[lang=en] .ko,html[lang=ko] .en{display:none!important}
 
 <h2>4. 실행한 뒤 두 가지 보기</h2>
 <ol><li><b>ΔAIC:</b> 0이 후보 중 가장 좋은 값이고, 2까지는 사실상 동률입니다.</li><li><b>진단:</b> ✓, △, ✕로 표시됩니다. ΔAIC가 낮은데 ✕라면 "후보 중에는 낫지만 잘 맞지는 않을 수 있다"는 뜻입니다.</li></ol>
-<p>AICc, BIC 등은 필요할 때 보셔도 됩니다.</p>
+<p><b>AIC란?</b> 모델이 데이터를 얼마나 잘 설명하는지에, 모수가 늘어날 때마다 벌점을 더한 점수입니다. 모수가 많은 모델은 거의 언제나 데이터를 더 가깝게 따라가므로, 복잡하다는 이유만으로 유리해지지 않도록 벌점을 줍니다. <b>낮을수록 좋습니다.</b></p>
+<p><b>ΔAIC</b>는 가장 낮은 값과의 차이이고, 의미가 있는 것은 이 차이입니다.</p><div class="tw"><table><tr><th>모델</th><th>AIC</th><th>ΔAIC</th><th>말로 풀면</th></tr><tr><td>Gamma</td><td>1200.0</td><td>0</td><td>후보 중 가장 낮음</td></tr><tr><td>Lognormal</td><td>1201.5</td><td>1.5</td><td>사실상 동률</td></tr><tr><td>Gaussian</td><td>1238.0</td><td>38</td><td>뚜렷하게 뒤처짐</td></tr></table></div>
+<ul><li>AIC 값 자체의 크기(1200이나 −50)에는 뜻이 없습니다. 음수여도 괜찮습니다.</li><li>같은 행의 같은 Y로 만든 모델끼리 비교할 수 있습니다. log(Y) 모델과 원래 Y 모델은 바로 비교하기 어려운데, Lognormal은 앱이 보정해 둡니다.</li><li>후보 안에서의 순위입니다. 모두 잘 맞지 않아도 1등은 나오기 때문에 진단을 함께 봅니다.</li></ul>
+<p class="mut">AICc는 표본이 작을 때를 보정한 AIC입니다. BIC는 표본이 아주 작지 않으면 모수에 벌점을 더 크게 줍니다. 서로 다른 모델을 가리키면 후보들이 비슷하다는 신호일 수 있습니다.</p>
 
 <h2>5. Q-Q 플롯 읽기</h2>
 <p>점이 대각선에 붙어 있을수록 좋습니다. 회색 띠는 우연히 벗어날 수 있는 범위입니다. 양 끝은 조금 벗어나는 일이 흔하므로 가운데부터 보시면 됩니다.</p>
@@ -129,15 +152,29 @@ html[lang=en] .ko,html[lang=ko] .en{display:none!important}
 <tr><td>Lognormal</td><td>conditionB exp 1.13</td><td>B의 기하평균이 A의 약 1.13배</td></tr>
 <tr><td>Binomial (logit)</td><td>conditionB exp 2.0</td><td>B의 오즈가 A의 약 2배 ("확률이 2배"와는 다름)</td></tr>
 <tr><td>순서형 (logit)</td><td>uinew 추정치 0.9</td><td>new에서 더 높은 점수 쪽으로 이동, exp(0.9) ≈ 2.5는 오즈비</td></tr></table></div>
-<ul><li>95% 구간에 0(exp는 1)이 없으면 "차이 없음"으로 설명하기 어려운 데이터입니다. 포함되더라도 차이가 없다는 증거로 보기는 어렵습니다.</li><li>랜덤효과가 있으면 로그, 로짓 링크의 효과는 랜덤효과 수준이 같을 때(예: 같은 사람)의 비교입니다.</li><li>교호작용이 있으면 한 행만으로 전체 효과를 말하기 어렵습니다.</li><li>Gamma (inverse)에서는 계수가 양수이면 평균이 낮다는 뜻입니다.</li></ul>
+<ul><li>95% 구간에 0(exp는 1)이 없으면 "차이 없음"으로 설명하기 어려운 데이터입니다. 포함되더라도 차이가 없다는 증거로 보기는 어렵습니다.</li><li>랜덤효과가 있으면 로그, 로짓 링크의 효과는 랜덤효과 수준이 같을 때(예: 같은 사람)의 비교입니다.</li><li>교호작용이 있으면 한 행만으로 전체 효과를 말하기 어렵습니다(9번 참고).</li><li>Gamma (inverse)에서는 계수가 양수이면 평균이 낮다는 뜻입니다(8번 참고).</li></ul>
 
-<h2>8. R에서 코드 사용하기</h2>
+<h2>8. Gamma의 log 링크와 inverse 링크</h2>
+<p>둘 다 분포는 Gamma입니다. <b>링크는 X가 평균을 어떻게 바꾸는지를 정합니다.</b></p><div class="tw"><table><tr><th></th><th>Gamma (log)</th><th>Gamma (inverse)</th></tr><tr><td>더해지는 값</td><td>평균의 로그</td><td>1 / 평균</td></tr><tr><td>X의 효과</td><td>평균에 <b>곱해짐</b></td><td>1 / 평균에 <b>더해짐</b>. Y가 시간이면 속도에 해당</td></tr><tr><td>계수가 양수이면</td><td>평균이 높음</td><td>평균이 <b>낮음</b> (부호가 반대로 보임)</td></tr><tr><td>보고 방법</td><td>exp(추정치)가 평균의 배수</td><td>계수보다 예측 평균으로 설명하는 편이 쉬움</td></tr><tr><td>예측 평균</td><td>항상 양수</td><td>1 / 평균이 0 이하가 되면 계산이 어려워짐</td></tr></table></div>
+<p>과제 시간이 A에서 500 ms, B에서 625 ms라고 하겠습니다.</p><div class="tw"><table><tr><th>링크</th><th>B의 계수</th><th>읽는 법</th></tr><tr><td>log</td><td>0.223</td><td>exp(0.223) = 1.25: B에서 1.25배 걸림</td></tr><tr><td>inverse</td><td>−0.0004</td><td>1/500 = 0.0020이 1/625 = 0.0016으로: 속도가 초당 2.0에서 1.6으로 줄어듦</td></tr></table></div>
+<p>수치 X(예: 난이도 0, 1, 2)에서는 두 링크가 다르게 휘기 시작합니다.</p><div class="tw"><table><tr><th>난이도</th><th>log</th><th>inverse</th></tr><tr><td>0</td><td>500 ms</td><td>500 ms (초당 2.0)</td></tr><tr><td>1</td><td>625 ms (× 1.25)</td><td>625 ms (초당 1.6)</td></tr><tr><td>2</td><td>781 ms (× 1.25)</td><td>833 ms (초당 1.2)</td></tr></table></div>
+<div class="lk"></div>
+<ul><li>범주 X가 하나이고 랜덤효과가 없으면 두 링크의 예측 평균과 AIC가 같습니다. 수치 X가 있거나, 교호작용을 다 넣지 않은 여러 X가 있거나, 랜덤효과가 있으면 달라집니다.</li><li>log는 흔히 쓰이고 보고하기 쉽습니다. 속도나 비율이 연구 질문이면 inverse가 어울릴 수 있습니다.</li><li><b>R에서 링크 없이 <code>Gamma()</code>라고 쓰면 inverse입니다.</b> <code>Gamma(link = "log")</code>처럼 적어 두면 혼동을 줄일 수 있습니다.</li><li>Gamma (identity)는 원래 단위의 평균에 바로 더해지지만, 예측값이 0 아래로 내려갈 수 있습니다.</li><li>앱에서는 "링크 함수도 비교"를 켜면 inverse와 identity도 함께 볼 수 있습니다.</li></ul>
+
+<h2>9. 교호작용</h2>
+<p><b>교호작용은 한 X의 효과가 다른 X에 따라 달라지는 것입니다.</b> 숙련자(expert)와 초보자(novice)가 두 도구를 쓸 때 점수 평균이 다음과 같다고 하겠습니다.</p><div class="tw"><table><tr><th></th><th>tool A</th><th>tool B</th><th>B − A</th></tr><tr><td>expert</td><td>8</td><td>9</td><td>+1</td></tr><tr><td>novice</td><td>10</td><td>14</td><td>+4</td></tr></table></div>
+<p>도구 B를 쓰면 숙련자는 1, 초보자는 4가 늘어납니다. 효과가 서로 달라서 두 선이 평행하지 않습니다.</p><div class="it"></div>
+<p>Gaussian 모델이라면 표는 이렇게 나옵니다.</p><div class="tw"><table><tr><th>행</th><th>추정치</th><th>말로 풀면</th></tr><tr><td>(Intercept)</td><td>8</td><td>expert가 A를 쓸 때 (둘 다 기준 수준)</td></tr><tr><td>toolB</td><td>1</td><td><b>expert에서만</b> 본 B의 효과</td></tr><tr><td>groupnovice</td><td>2</td><td><b>A를 쓸 때만</b> 본 novice와 expert의 차이</td></tr><tr><td>toolB:groupnovice</td><td>3</td><td>novice에서 B의 효과가 얼마나 더 큰지</td></tr></table></div>
+<p>초보자가 B를 쓸 때: 8 + 1 + 2 + 3 = 14. 교호작용 3은 차이의 차이, 즉 4 − 1입니다.</p>
+<ul><li><b>오해하기 쉬운 부분:</b> 교호작용이 들어가면 <code>toolB</code>는 B의 전체 효과가 아니라, 다른 X가 기준 수준일 때의 효과입니다.</li><li>로그 링크에서 exp(교호작용)은 배수의 비입니다. B가 숙련자에서 A의 1.1배, 초보자에서 1.4배라면 1.4 / 1.1 ≈ 1.27입니다. 원래 척도에서 평행하지 않은 선이 로그 척도에서는 평행할 수도 있습니다.</li><li>수치 X와의 교호작용이면 다른 X의 효과는 그 X가 0일 때의 값입니다. 표준화하면 0이 평균을 뜻하게 됩니다.</li><li>효과가 서로 다른지가 연구 질문일 때 어울립니다. "2원 교호작용 포함"은 모든 쌍을 넣기 때문에 데이터가 작으면 많을 수 있습니다.</li></ul>
+
+<h2>10. R에서 코드 사용하기</h2>
 <ol><li>CSV를 R 프로젝트 폴더에 둡니다. 앱에서 변환한 데이터는 "이 데이터 CSV 저장"으로 받으실 수 있습니다.</li><li><code>install.packages</code> 줄은 처음 한 번 실행합니다.</li><li>코드를 붙여 넣고 한 줄씩 실행합니다.</li></ol>
 <div class="tw"><table><tr><th>메시지</th><th>흔한 원인</th></tr><tr><td><code>cannot open file</code></td><td>작업 폴더가 다를 수 있습니다. <code>getwd()</code>로 확인합니다.</td></tr><tr><td><code>there is no package called</code></td><td>설치 줄을 아직 실행하지 않았을 수 있습니다.</td></tr><tr><td><code>object 'm' not found</code></td><td>앞줄에서 오류가 났을 수 있습니다. 위에서부터 다시 실행합니다.</td></tr></table></div>
 <p>코드는 출발점입니다. X, 교호작용, 랜덤효과를 연구 설계에 맞게 조정하시기를 권합니다.</p>
 
-<h2>9. 자주 나오는 말</h2>
-<div class="tw"><table><tr><td><b>분포</b></td><td>Y가 예측값 주변에 흩어지는 모양</td></tr><tr><td><b>링크</b></td><td>X를 더하는 척도. log이면 효과가 곱셈이 됨</td></tr><tr><td><b>랜덤효과</b></td><td>사람이나 집단마다 다른 수준을 허용하는 부분</td></tr><tr><td><b>과산포</b></td><td>분포가 예상하는 것보다 더 퍼져 있음</td></tr><tr><td><b>영과잉(ZI), Hurdle</b></td><td>0을 따로 다루는 부분이 있는 모형</td></tr><tr><td><b>잔차</b></td><td>실제와 예측의 차이. 여기서는 모델이 맞으면 Q-Q가 직선이 되도록 변환함</td></tr><tr><td><b>수렴</b></td><td>계산이 하나의 답에 안정적으로 도달함</td></tr><tr><td><b>singular</b></td><td>이 데이터로 추정하기에 랜덤효과가 너무 작거나 복잡함</td></tr></table></div>
+<h2>11. 자주 나오는 말</h2>
+<div class="tw"><table><tr><td><b>분포</b></td><td>Y가 예측값 주변에 흩어지는 모양</td></tr><tr><td><b>링크</b></td><td>X를 더하는 척도. log이면 효과가 곱셈이 됨</td></tr><tr><td><b>랜덤효과</b></td><td>사람이나 집단마다 다른 수준을 허용하는 부분</td></tr><tr><td><b>랜덤 기울기</b></td><td>전체 수준뿐 아니라 X의 효과도 사람마다 다를 수 있게 함</td></tr><tr><td><b>기준 수준</b></td><td>다른 범주와 비교하는 기준이 되는 범주</td></tr><tr><td><b>exp(추정치)</b></td><td>로그 척도의 계수를 배수로 바꾼 값. 1이면 차이 없음</td></tr><tr><td><b>오즈</b></td><td>일어날 확률을 일어나지 않을 확률로 나눈 값. 80%이면 0.8 / 0.2 = 4</td></tr><tr><td><b>표준오차</b></td><td>표본을 다시 뽑을 때 추정치가 보통 달라지는 정도</td></tr><tr><td><b>95% 구간</b></td><td>모델이 맞다면, 표본을 반복해 뽑을 때 약 95%가 참값을 포함하게 되는 방법으로 만든 구간</td></tr><tr><td><b>p값</b></td><td>효과가 없고 모델이 맞다고 할 때, 이만큼 이상 극단적인 결과가 나올 확률. "효과가 없을 확률"과는 다름</td></tr><tr><td><b>표준화</b></td><td>평균을 빼고 표준편차로 나눔. 1이 1 SD를 뜻하게 됨</td></tr><tr><td><b>과산포</b></td><td>분포가 예상하는 것보다 더 퍼져 있음</td></tr><tr><td><b>영과잉(ZI), Hurdle</b></td><td>0을 따로 다루는 부분이 있는 모형</td></tr><tr><td><b>잔차</b></td><td>실제와 예측의 차이. 여기서는 모델이 맞으면 Q-Q가 직선이 되도록 변환함</td></tr><tr><td><b>수렴</b></td><td>계산이 하나의 답에 안정적으로 도달함</td></tr><tr><td><b>singular</b></td><td>이 데이터로 추정하기에 랜덤효과가 너무 작거나 복잡함</td></tr></table></div>
 </section>
 </main>
 <script>
@@ -148,6 +185,10 @@ const P=[[x=>x+.05*Math.sin(x*9),'Good fit','on the diagonal','잘 맞음','대�
 [x=>.6*x,'Underdispersion','the line is too flat: less spread than expected','과소산포','선이 완만함: 예상보다 덜 퍼져 있음']];
 const X=v=>8+(v+3.4)/6.8*164,Y=v=>132-(Math.max(-3.4,Math.min(3.4,v))+3.4)/6.8*124;
 document.querySelectorAll('[data-q]').forEach(el=>{const k=el.dataset.q==='ko'?3:1;el.innerHTML=P.map(p=>`<figure><svg viewBox="0 0 180 140" role="img" aria-label="${p[k]}"><path d="M8 6V132H174" fill="none" stroke="var(--ax)"/><path d="M${X(-3.4)} ${Y(-3.4)}L${X(3.4)} ${Y(3.4)}" stroke="var(--ink2)" stroke-dasharray="4 3"/>${Array.from({length:25},(_,i)=>-2.4+i*.2).map(x=>`<circle cx="${X(x)}" cy="${Y(p[0](x))}" r="2.2" fill="var(--s1)"/>`).join('')}</svg><figcaption><b>${p[k]}</b><br><span class="mut">${p[k+1]}</span></figcaption></figure>`).join('')});
+const line=(el,al,ys,yt,xt,c)=>{const y=v=>150-(v-yt[0])/(yt.at(-1)-yt[0])*115,x=i=>70+i*140/(xt.length-1);el.innerHTML=`<svg viewBox="0 0 320 180" role="img" aria-label="${al}" style="width:100%;max-width:360px;display:block"><path d="M44 20V150H240" fill="none" stroke="var(--ax)"/>${yt.map(v=>`<text x="38" y="${y(v)+4}" text-anchor="end">${v}</text>`).join('')}${xt.map((t,i)=>`<text x="${x(i)}" y="170" text-anchor="middle">${t}</text>`).join('')}${c.map(([n,v,k])=>`<path d="M${v.map((a,i)=>x(i*(xt.length-1)/(v.length-1))+' '+y(a)).join('L')}" fill="none" stroke="${k}" stroke-width="2"/><text x="218" y="${y(v.at(-1))+(n==='log'?14:n==='inverse'?-2:4)}">${n}</text>`).join('')}</svg>`};
+document.querySelectorAll('.it').forEach(el=>line(el,'novice 10 to 14, expert 8 to 9',0,[6,8,10,12,14],['tool A','tool B'],[['novice',[10,14],'var(--s2)'],['expert',[8,9],'var(--s1)']]));
+const T=Array.from({length:21},(_,i)=>i/10);
+document.querySelectorAll('.lk').forEach(el=>line(el,'predicted mean by difficulty: log 500, 625, 781; inverse 500, 625, 833',0,[400,600,800],['0','1','2'],[['inverse',T.map(t=>1000/(2-.4*t)),'var(--s2)'],['log',T.map(t=>500*1.25**t),'var(--s1)']]));
 let L=new URLSearchParams(location.search).get('lang');try{L=L||localStorage.getItem('lang')}catch{}
 function set(l){document.documentElement.lang=l;document.title=l==='ko'?'초보자 안내 · GLM 분포 비교':'Beginner guide · GLM Distribution Explorer';document.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===l))}
 set(L==='ko'?'ko':'en');document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{set(b.dataset.l);try{localStorage.setItem('lang',b.dataset.l)}catch{}});

@@ -102,11 +102,12 @@ setup <- function(cfgjson) {
   cfg <- fromJSON(cfgjson)
   v <- function(i) sprintf("vv%d__", as.integer(i))
   yv <- v(cfg$y); num <- v(cfg$num); fac <- v(cfg$fac); re <- v(cfg$re)
-  off <- if (length(cfg$off)) v(cfg$off); tr <- if (length(cfg$tri)) v(cfg$tri)
-  d <- S$raw[c(yv, num, fac, re, off, tr)]; n0 <- nrow(d); d <- d[complete.cases(d), , drop = FALSE]
+  off <- if (length(cfg$off)) v(cfg$off); tr <- if (length(cfg$tri)) v(cfg$tri); fl <- if (length(cfg$fai)) v(cfg$fai)
+  if (cfg$kind != "trials") tr <- fl <- NULL
+  d <- S$raw[c(yv, num, fac, re, off, tr, fl)]; n0 <- nrow(d); d <- d[complete.cases(d), , drop = FALSE]
   warn <- character(); kind <- cfg$kind
   if (nrow(d) < 10) stop("{{결측을 뺀 행이 10개 미만이라 계산이 어렵습니다.||Fewer than 10 rows remain after removing missing values.}}")
-  for (k in c(num, off, tr)) if (!is.numeric(d[[k]])) stop(bf("{{'%s' 열이 숫자 형식인지 확인해 주십시오.||Column '%s' is not numeric.}}", lab(k)))
+  for (k in c(num, off, tr, fl)) if (!is.numeric(d[[k]])) stop(bf("{{'%s' 열이 숫자 형식인지 확인해 주십시오.||Column '%s' is not numeric.}}", lab(k)))
   if (kind == "ordinal") {
     if (!is.numeric(d[[yv]])) stop("{{순서형 Y는 1, 2, 3처럼 숫자로 코딩해 주십시오.||Please code ordinal Y as numbers such as 1, 2, 3.}}")
     if (length(unique(d[[yv]])) < 3) stop("{{순서형 Y는 단계가 3개 이상 필요합니다.||Ordinal Y needs at least 3 levels.}}")
@@ -121,8 +122,10 @@ setup <- function(cfgjson) {
     prop = any(y < 0 | y > 1), FALSE)
   if (bad) stop("{{Y 값이 고른 유형과 맞지 않을 수 있습니다 (음수, 0, 소수 여부를 확인해 주십시오).||Y does not match the selected type (check for negatives, zeros or decimals).}}")
   if (kind == "trials") {
-    if (is.null(tr)) stop("{{시행 수 열을 지정해 주십시오.||Please assign a trials column.}}")
-    if (!int || any(y < 0 | y > d[[tr]]) || any(d[[tr]] < 1 | d[[tr]] %% 1 != 0)) stop("{{성공 수와 시행 수 값을 확인해 주십시오.||Invalid successes/trials values.}}")
+    if (is.null(tr) && is.null(fl)) stop("{{성공 수를 Y로 두고, 시행 수나 실패 수 열을 하나 지정해 주십시오.||Set successes as Y and assign one trials or failures column.}}")
+    tot <- if (is.null(fl)) d[[tr]] else y + d[[fl]]
+    if (!is.null(fl) && any(d[[fl]] < 0 | d[[fl]] %% 1 != 0)) stop("{{실패 수 값을 확인해 주십시오 (0 이상의 정수).||Check the failures values (whole numbers, 0 or more).}}")
+    if (!int || any(y < 0 | y > tot) || any(tot < 1 | tot %% 1 != 0)) stop("{{성공 수와 시행 수 값을 확인해 주십시오.||Invalid successes/trials values.}}")
   }
   if (length(unique(y)) < 2) stop("{{Y 값이 모두 같습니다.||All Y values are identical.}}")
   if (!is.null(off)) {
@@ -149,8 +152,8 @@ setup <- function(cfgjson) {
   if (kind == "ordinal" && !is.null(slope)) { slope <- NULL; warn <- c(warn, "{{순서형에서는 랜덤 기울기를 지원하지 않아 랜덤 절편만 썼습니다.||Random slopes are not supported for ordinal Y; only random intercepts were used.}}") }
   if (!is.null(slope) && !(slope %in% rhsx)) stop("{{랜덤 기울기 변수를 X에도 넣어 주십시오.||The random slope variable must also be an X.}}")
   ret <- if (length(re)) paste(sprintf("(1%s | %s)", if (is.null(slope)) "" else paste(" +", slope), re), collapse = " + ")
-  S$tr <- tr; S$slope <- slope; S$off <- off; S$rhs <- rhs; S$re <- re; S$yv <- yv; S$kind <- kind; S$d <- d; S$y <- y
-  lhs <- if (kind == "trials") sprintf("cbind(%s, %s - %s)", yv, tr, yv) else yv
+  S$tr <- tr; S$fl <- fl; S$slope <- slope; S$off <- off; S$rhs <- rhs; S$re <- re; S$yv <- yv; S$kind <- kind; S$d <- d; S$y <- y
+  lhs <- if (kind == "trials") if (is.null(fl)) sprintf("cbind(%s, %s - %s)", yv, tr, yv) else sprintf("cbind(%s, %s)", yv, fl) else yv
   S$f <- paste(lhs, "~", paste(c(rhs, ret, if (!is.null(off)) sprintf("offset(log(%s))", off)), collapse = " + "))
   S$L <- candidates(kind, y, length(re) > 0, isTRUE(cfg$links), !is.null(off)); S$fits <- list(); dis <- list()
   if (S$zy) { dis <- lapply(S$L, `[[`, "name"); dis <- dis[dis != "Gaussian"]

@@ -37,7 +37,7 @@ py_for <- function(i, file, sep = ",", enc = "UTF-8") {
     "Binomial (logit)" = glmc("Binomial()"),
     "Binomial (probit)" = glmc("Binomial(sm.families.links.Probit())"),
     "Binomial (cloglog)" = glmc("Binomial(sm.families.links.CLogLog())"),
-    "Binomial" = c(X, "# {{[성공, 실패]||[successes, failures]}}", sprintf("Y = np.column_stack([%1$s, %2$s - %1$s])", yv, if (!is.null(S$tr)) col(S$tr) else ""), "m = sm.GLM(Y, X, family=sm.families.Binomial()).fit()"),
+    "Binomial" = c(X, "# {{[성공, 실패]||[successes, failures]}}", if (!is.null(S$fl)) sprintf("Y = np.column_stack([%s, %s])", yv, col(S$fl)) else sprintf("Y = np.column_stack([%1$s, %2$s - %1$s])", yv, if (!is.null(S$tr)) col(S$tr) else ""), "m = sm.GLM(Y, X, family=sm.families.Binomial()).fit()"),
     "Cumulative (logit)" = , "Cumulative (probit)" = if (S$rhs != "1") c(X, "X = X.drop(columns=\"Intercept\")",
       sprintf("y = pd.Series(pd.Categorical(%s, ordered=True), index=d.index)", yv),
       sprintf("m = OrderedModel(y, X, distr=\"%s\").fit(method=\"bfgs\", maxiter=2000, disp=0)", k$fam)))
